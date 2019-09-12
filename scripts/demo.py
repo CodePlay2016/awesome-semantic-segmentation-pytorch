@@ -22,16 +22,17 @@ parser.add_argument('--save-folder', default='~/.torch/models',
                     help='Directory for saving checkpoint models')
 parser.add_argument('--input-pic', type=str, default='../datasets/voc/VOC2012/JPEGImages/2007_000032.jpg',
                     help='path to the input picture')
-parser.add_argument('--outdir', default='./eval', type=str,
+parser.add_argument('--out-dir', default='./eval', type=str,
                     help='path to save the predict result')
+parser.add_argument('--local_rank', type=int, default=0)
 args = parser.parse_args()
 
 
 def demo(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # output folder
-    if not os.path.exists(config.outdir):
-        os.makedirs(config.outdir)
+    if not os.path.exists(config.out_dir):
+        os.makedirs(config.out_dir)
 
     # image transform
     transform = transforms.Compose([
@@ -41,7 +42,7 @@ def demo(config):
     image = Image.open(config.input_pic).convert('RGB')
     images = transform(image).unsqueeze(0).to(device)
 
-    model = get_model(args.model, pretrained=True, root=args.save_folder).to(device)
+    model = get_model(config.model, pretrained=True, root=config.save_folder, local_rank=config.local_rank).to(device)
     print('Finished loading model!')
 
     model.eval()
@@ -49,9 +50,9 @@ def demo(config):
         output = model(images)
 
     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-    mask = get_color_pallete(pred, args.dataset)
-    outname = os.path.splitext(os.path.split(args.input_pic)[-1])[0] + '.png'
-    mask.save(os.path.join(args.outdir, outname))
+    mask = get_color_pallete(pred, config.dataset)
+    outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + '.png'
+    mask.save(os.path.join(config.out_dir, outname))
 
 
 if __name__ == '__main__':
