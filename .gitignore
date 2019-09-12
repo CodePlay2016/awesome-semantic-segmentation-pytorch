@@ -129,3 +129,5 @@ nn/sync_bn/
 
 # codeplay
 .vscode/
+/scripts/*.log
+/runs/logs/
