@@ -8,7 +8,7 @@ from .fcn import _FCNHead
 
 __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deeplabv3_resnet101_voc',
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
-           'get_deeplabv3_resnet152_ade']
+           'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys']
 
 
 class DeepLabV3(SegBaseModel):
@@ -161,6 +161,9 @@ def get_deeplabv3_resnet50_voc(**kwargs):
 
 def get_deeplabv3_resnet101_voc(**kwargs):
     return get_deeplabv3('pascal_voc', 'resnet101', **kwargs)
+
+def get_deeplabv3_resnet101_citys(**kwargs):
+    return get_deeplabv3('citys', 'resnet101', **kwargs)
 
 
 def get_deeplabv3_resnet152_voc(**kwargs):

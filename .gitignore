@@ -126,3 +126,6 @@ eval/
 
 # nn
 nn/sync_bn/
+
+# codeplay
+.vscode/
