@@ -131,3 +131,4 @@ nn/sync_bn/
 .vscode/
 /scripts/*.log
 /runs/logs/
+/models/*
