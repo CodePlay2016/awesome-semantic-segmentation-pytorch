@@ -110,7 +110,7 @@ def get_color_pallete(npimg, dataset='pascal_voc'):
         return out_img
     elif dataset == 'citys':
         out_img = Image.fromarray(npimg.astype('uint8'))
-        out_img.putpalette(cityspallete)
+        # out_img.putpalette(cityspallete)
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
