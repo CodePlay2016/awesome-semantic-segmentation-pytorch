@@ -63,6 +63,28 @@ def save_colorful_images(prediction, filename, output_dir, palettes):
     im.save(fn)
 
 
+def get_color_pallete_c(npimg, dataset='pascal_voc'):
+    # recovery boundary
+    if dataset in ('pascal_voc', 'pascal_aug'):
+        npimg[npimg == -1] = 255
+    # put colormap
+    if dataset == 'ade20k':
+        npimg = npimg + 1
+        out_img = Image.fromarray(npimg.astype('uint8'))
+        out_img.putpalette(adepallete)
+        return out_img
+    elif dataset == 'citys':
+        out_img = Image.fromarray(npimg.astype('uint8'))
+        out_img.putpalette(cityspallete)
+        return out_img
+    out_img = Image.fromarray(npimg.astype('uint8'))
+    out_img.putpalette(vocpallete)
+    return out_img
+
+def putpalette(npimg, palette):
+    img = npimg
+    return img
+
 def get_color_pallete(npimg, dataset='pascal_voc'):
     """Visualize image.
 

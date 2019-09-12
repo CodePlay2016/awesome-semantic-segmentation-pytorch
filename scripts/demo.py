@@ -50,9 +50,10 @@ def demo(config):
         output = model(images)
 
     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-    mask = get_color_pallete(pred, config.dataset)
+    # mask = get_color_pallete(pred, config.dataset)
     outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + '.png'
-    mask.save(os.path.join(config.out_dir, outname))
+    # mask.save(os.path.join(config.out_dir, outname))
+    pred.save(os.path.join(config.out_dir, outname))
 
 
 if __name__ == '__main__':
