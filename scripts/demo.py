@@ -51,7 +51,7 @@ def demo(config):
 
     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
     mask = get_color_pallete_c(pred, config.dataset)
-    outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + '.png'
+    outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
     mask.save(os.path.join(config.out_dir, outname))
 
 
