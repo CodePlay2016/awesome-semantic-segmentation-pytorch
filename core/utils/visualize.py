@@ -74,8 +74,8 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         out_img.putpalette(adepallete)
         return out_img
     elif dataset == 'citys':
-        out_img = Image.fromarray(npimg.astype('uint8'))
-        out_img.putpalette(cityspallete)
+        npimg = putpalette(npimg, cityspallete)
+        out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
@@ -83,6 +83,16 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
 
 def putpalette(npimg, palette):
     img = npimg
+    # npimg = np.array(img.getdata()).reshape(img.size[0], img.size[1])
+    out_r = np.zeros((npimg.shape[0], npimg.shape[1]))
+    out_g = np.zeros((npimg.shape[0], npimg.shape[1]))
+    out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
+    for i in range(19):
+        index = (npimg == i)
+        out_r = np.where(index, np.ones_like(out_r) * cityspallete[3*i], out_r)
+        out_g = np.where(index, np.ones_like(out_r) * cityspallete[3*i+1], out_g)
+        out_b = np.where(index, np.ones_like(out_r) * cityspallete[3*i+2], out_b)
+    img = np.stack([out_r, out_g, out_b], axis=-1)
     return img
 
 def get_color_pallete(npimg, dataset='pascal_voc'):
@@ -110,7 +120,7 @@ def get_color_pallete(npimg, dataset='pascal_voc'):
         return out_img
     elif dataset == 'citys':
         out_img = Image.fromarray(npimg.astype('uint8'))
-        # out_img.putpalette(cityspallete)
+        out_img.putpalette(cityspallete)
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
@@ -178,3 +188,12 @@ cityspallete = [
     0, 0, 230,
     119, 11, 32,
 ]
+
+if __name__ == "__main__":
+    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/berlin_000182_000019_leftImg8bit.png"
+    img = Image.open(img_path)
+    npimg = np.array(img.getdata()).reshape(img.size[1], img.size[0])
+    img_p = get_color_pallete(npimg, dataset='citys')
+    img_pc = get_color_pallete_c(npimg, dataset='citys')
+    
+    print('a')
