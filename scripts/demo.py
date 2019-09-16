@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import torch
+import pdb
 
 cur_path = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(cur_path)[0]
@@ -50,6 +51,7 @@ def demo(config):
         output = model(images)
 
     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+    pdb.set_trace()
     mask = get_color_pallete_c(pred, config.dataset)
     outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + '.png'
     mask.save(os.path.join(config.out_dir, outname))
