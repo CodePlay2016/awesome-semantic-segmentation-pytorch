@@ -9,7 +9,7 @@ sys.path.append(root_path)
 
 from torchvision import transforms
 from PIL import Image
-from core.utils.visualize import get_color_pallete
+from core.utils.visualize import get_color_pallete, get_color_pallete_c
 from core.models import get_model
 
 parser = argparse.ArgumentParser(
@@ -50,7 +50,7 @@ def demo(config):
         output = model(images)
 
     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-    mask = get_color_pallete(pred, config.dataset)
+    mask = get_color_pallete_c(pred, config.dataset)
     outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + '.png'
     mask.save(os.path.join(config.out_dir, outname))
 
