@@ -54,7 +54,9 @@ def demo(config):
     with torch.no_grad():
         start = time.time()
         for _ in range(REP):
-                output = model(images)
+            sstart = time.time()
+            output = model(images)
+            print('____time%.2f'%(time.time()-sstart))
             # pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             # mask = get_color_pallete_c(pred, config.dataset)
             # outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
