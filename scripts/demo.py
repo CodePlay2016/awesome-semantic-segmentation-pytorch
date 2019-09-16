@@ -51,15 +51,15 @@ def demo(config):
     image = Image.open(config.input_pic).convert('RGB')
     images = transform(image).unsqueeze(0).to(device)
 
-    start = time.time()
-    for _ in range(REP):
-        with torch.no_grad():
-            output = model(images)
-        # pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-        # mask = get_color_pallete_c(pred, config.dataset)
-        # outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
-        # mask.save(os.path.join(config.out_dir, outname))
-    elapse = time.time() - start
+    with torch.no_grad():
+        start = time.time()
+        for _ in range(REP):
+                output = model(images)
+            # pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+            # mask = get_color_pallete_c(pred, config.dataset)
+            # outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
+            # mask.save(os.path.join(config.out_dir, outname))
+        elapse = time.time() - start
     print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
 
 if __name__ == '__main__':
