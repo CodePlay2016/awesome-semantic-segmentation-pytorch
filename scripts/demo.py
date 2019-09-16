@@ -33,6 +33,7 @@ REP = args.repetition
 
 def demo(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print('using device %s' % device)
     # output folder
     if not os.path.exists(config.out_dir):
         os.makedirs(config.out_dir)
