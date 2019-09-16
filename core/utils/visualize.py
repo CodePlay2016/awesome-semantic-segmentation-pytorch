@@ -126,7 +126,6 @@ def get_color_pallete(npimg, dataset='pascal_voc'):
     out_img.putpalette(vocpallete)
     return out_img
 
-
 def _getvocpallete(num_cls):
     n = num_cls
     pallete = [0] * (n * 3)
