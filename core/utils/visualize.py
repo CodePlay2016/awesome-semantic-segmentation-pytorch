@@ -190,7 +190,7 @@ cityspallete = [
 ]
 
 if __name__ == "__main__":
-    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/berlin_000189_000019_leftImg8bit.png"
+    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/visualization/berlin_000192_000019_leftImg8bit.png"
     img = Image.open(img_path)
     npimg = np.array(img.getdata()).reshape(img.size[1], img.size[0])
     img_p = get_color_pallete(npimg, dataset='citys')
