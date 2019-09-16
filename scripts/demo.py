@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import time
 import torch
 
 cur_path = os.path.abspath(os.path.dirname(__file__))
@@ -25,14 +26,21 @@ parser.add_argument('--input-pic', type=str, default='../datasets/voc/VOC2012/JP
 parser.add_argument('--out-dir', default='./eval', type=str,
                     help='path to save the predict result')
 parser.add_argument('--local_rank', type=int, default=0)
+parser.add_argument('--repetition', type=int, default=1)
 args = parser.parse_args()
 
+REP = args.repetition
 
 def demo(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # output folder
     if not os.path.exists(config.out_dir):
         os.makedirs(config.out_dir)
+    
+    # load model
+    model = get_model(config.model, pretrained=True, root=config.save_folder, local_rank=config.local_rank).to(device)
+    print('Finished loading model!')
+    model.eval()
 
     # image transform
     transform = transforms.Compose([
@@ -42,18 +50,15 @@ def demo(config):
     image = Image.open(config.input_pic).convert('RGB')
     images = transform(image).unsqueeze(0).to(device)
 
-    model = get_model(config.model, pretrained=True, root=config.save_folder, local_rank=config.local_rank).to(device)
-    print('Finished loading model!')
-
-    model.eval()
-    with torch.no_grad():
-        output = model(images)
-
-    pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-    mask = get_color_pallete_c(pred, config.dataset)
-    outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
-    mask.save(os.path.join(config.out_dir, outname))
-
+    start = time.time()
+    for _ in range(REP):
+        with torch.no_grad():
+            output = model(images)
+        # pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+        # mask = get_color_pallete_c(pred, config.dataset)
+        # outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
+        # mask.save(os.path.join(config.out_dir, outname))
+    print('time used for %d repetition is %.2f seconds'%(REP, time.time()))
 
 if __name__ == '__main__':
     demo(args)
