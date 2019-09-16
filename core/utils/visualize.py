@@ -190,9 +190,11 @@ cityspallete = [
 ]
 
 if __name__ == "__main__":
-    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/visualization/berlin_000192_000019_leftImg8bit.png"
+    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/visualization/berlin_000192_000019_pred.png"
+    import cv2
+    img_cv = cv2.imread(img_path, cv2.IMREAD_COLOR)
     img = Image.open(img_path)
-    npimg = np.array(img.getdata()).reshape(img.size[1], img.size[0])
+    npimg = np.array(img)
     img_p = get_color_pallete(npimg, dataset='citys')
     img_pc = get_color_pallete_c(npimg, dataset='citys')
     
