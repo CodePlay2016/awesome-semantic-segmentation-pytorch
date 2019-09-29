@@ -36,7 +36,7 @@ class MapillarySegmentation(SegmentationDataset):
     NUM_CLASS = 66
     VALID_CLASS = list(range(NUM_CLASS))
 
-    def __init__(self, root='../datasets/citys', split='train', mode=None, transform=None, **kwargs):
+    def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
         super(MapillarySegmentation, self).__init__(root, split, mode, transform, **kwargs)
         # self.root = os.path.join(root, self.BASE_DIR)
         assert os.path.exists(self.root), "Please setup the dataset using ../datasets/mapillary.py"
@@ -134,4 +134,4 @@ def _get_mapillary_pairs(folder, split='train'):
 
 
 if __name__ == '__main__':
-    dataset = CitySegmentation()
+    dataset = MapillarySegmentation()
