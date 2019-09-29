@@ -45,12 +45,13 @@ class MapillarySegmentation(SegmentationDataset):
         if len(self.images) == 0:
             raise RuntimeError("Found 0 images in subfolders of:" + root + "\n")
         self.valid_classes = self.VALID_CLASS
-        self._key = np.array([-1, -1, -1, -1, -1, -1,
-                              -1, -1, 0, 1, -1, -1,
-                              2, 3, 4, -1, -1, -1,
-                              5, -1, 6, 7, 8, 9,
-                              10, 11, 12, 13, 14, 15,
-                              -1, -1, 16, 17, 18])
+        # self._key = np.array([-1, -1, -1, -1, -1, -1,
+        #                       -1, -1, 0, 1, -1, -1,
+        #                       2, 3, 4, -1, -1, -1,
+        #                       5, -1, 6, 7, 8, 9,
+        #                       10, 11, 12, 13, 14, 15,
+        #                       -1, -1, 16, 17, 18])
+        self._key = np.arange(0, self.NUM_CLASS)
         self._mapping = np.array(range(-1, len(self._key) - 1)).astype('int32')
 
     def _class_to_index(self, mask):
