@@ -196,5 +196,4 @@ if __name__ == "__main__":
     npimg = np.array(img)
     img_p = get_color_pallete(npimg, dataset='citys')
     img_pc = get_color_pallete_c(npimg, dataset='citys')
-    
     print('a')

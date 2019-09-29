@@ -144,6 +144,7 @@ def get_deeplabv3(dataset='pascal_voc', backbone='resnet50', pretrained=False, r
         'ade20k': 'ade',
         'coco': 'coco',
         'citys': 'citys',
+        'mapillary': 'mapillary'
     }
     from ..data.dataloader import datasets
     model = DeepLabV3(datasets[dataset].NUM_CLASS, backbone=backbone, pretrained_base=pretrained_base, **kwargs)
@@ -164,6 +165,9 @@ def get_deeplabv3_resnet101_voc(**kwargs):
 
 def get_deeplabv3_resnet101_citys(**kwargs):
     return get_deeplabv3('citys', 'resnet101', **kwargs)
+
+def get_deeplabv3_resnet101_mapillary(**kwargs):
+    return get_deeplabv3('mapillary', 'resnet101', **kwargs)
 
 
 def get_deeplabv3_resnet152_voc(**kwargs):
