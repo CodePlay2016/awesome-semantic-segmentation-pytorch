@@ -59,6 +59,8 @@ class MapillarySegmentation(SegmentationDataset):
         print("mapping: ", self._mapping)
         values = np.unique(mask)
         for value in values:
+            print(len(values))
+            print(value)
             assert (value in self._mapping)
         index = np.digitize(mask.ravel(), self._mapping, right=True)
         return self._key[index].reshape(mask.shape)
