@@ -51,7 +51,7 @@ class MapillarySegmentation(SegmentationDataset):
         #                       5, -1, 6, 7, 8, 9,
         #                       10, 11, 12, 13, 14, 15,
         #                       -1, -1, 16, 17, 18])
-        self._key = np.arange(0, self.NUM_CLASS)
+        self._key = np.arange(-1, self.NUM_CLASS-1)
         self._mapping = np.array(range(-1, len(self._key) - 1)).astype('int32')
 
     def _class_to_index(self, mask):
