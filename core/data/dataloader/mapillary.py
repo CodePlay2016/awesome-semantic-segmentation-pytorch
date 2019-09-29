@@ -56,6 +56,7 @@ class MapillarySegmentation(SegmentationDataset):
 
     def _class_to_index(self, mask):
         # assert the value
+        print("mapping: ", self._mapping)
         values = np.unique(mask)
         for value in values:
             assert (value in self._mapping)
