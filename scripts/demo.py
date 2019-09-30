@@ -60,10 +60,10 @@ def demo(config):
             output = model(images)
             # torch.cuda.synchronize()\\
             print('____time %.2fs'%(time.time()-sstart))
-            # pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-            # mask = get_color_pallete_c(pred, config.dataset)
-            # outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
-            # mask.save(os.path.join(config.out_dir, outname))
+            pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+            mask = get_color_pallete_c(pred, config.dataset)
+            outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
+            mask.save(os.path.join(config.out_dir, outname))
         elapse = time.time() - start
     print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
 

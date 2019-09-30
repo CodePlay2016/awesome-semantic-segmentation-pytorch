@@ -77,6 +77,9 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         npimg = putpalette(npimg, cityspallete)
         out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
+    elif dataset == 'mapillary':
+        npimg = putpalette(npimg, mapillarypallete)
+        out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
     return out_img
@@ -187,6 +190,8 @@ cityspallete = [
     0, 0, 230,
     119, 11, 32,
 ]
+
+mapillarypallete = []
 
 if __name__ == "__main__":
     img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/visualization/berlin_000192_000019_pred.png"
