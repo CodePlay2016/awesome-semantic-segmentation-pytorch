@@ -33,7 +33,8 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    NUM_CLASS = 66
+    USE_FULL_LABEL = False
+    NUM_CLASS = 66 if USE_FULL_LABEL else 17
     VALID_CLASS = list(range(NUM_CLASS))
 
     def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
