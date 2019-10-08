@@ -42,7 +42,7 @@ class MapillarySegmentation(SegmentationDataset):
     USE_FULL_LABEL = True
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
-
+    KEY = KEY
     LABEL_MAP = {i:KEY[i] for i in range(66)}
 
     def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
