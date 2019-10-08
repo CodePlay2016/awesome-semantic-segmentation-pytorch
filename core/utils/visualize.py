@@ -94,7 +94,7 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     num_class = datasets[dataset].NUM_CLASS if i_flag else 19
     unique = np.unique(npimg)
     count = dict({})
-    print('pixel:', npimg[365,300])
+    print('pixel:', npimg[340,369])
     for i in range(num_class):
         k = datasets[dataset].KEY[i]+1 if i_flag else i
         index = (npimg == i)
