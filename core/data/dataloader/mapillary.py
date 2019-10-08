@@ -6,7 +6,13 @@ import numpy as np
 from PIL import Image
 from .segbase import SegmentationDataset
 
-
+KEY = [-1, -1, 1, 2, 2, 2, -1, 0, 0, 1,
+          0, 6, 0, 0, 0, 6, -1, -1, -1, 5,
+          7, 7, 7, 0, 0, -1, -1, -1, -1, 6,
+          -1,-1, -1, -1, 8, -1, 0, -1, 8, -1,
+          -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
+          -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
+          4, 4, 4, -1, -1, -1]
 class MapillarySegmentation(SegmentationDataset):
     """Mapillary Vista Semantic Segmentation Dataset.
 
@@ -36,13 +42,7 @@ class MapillarySegmentation(SegmentationDataset):
     USE_FULL_LABEL = True
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
-    KEY = [-1, -1, 1, 2, 2, 2, -1, 0, 0, 1,
-          0, 6, 0, 0, 0, 6, -1, -1, -1, 5,
-          7, 7, 7, 0, 0, -1, -1, -1, -1, 6,
-          -1,-1, -1, -1, 8, -1, 0, -1, 8, -1,
-          -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
-          -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
-          4, 4, 4, -1, -1, -1]
+
     LABEL_MAP = {i:KEY[i] for i in range(66)}
 
     def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
