@@ -44,7 +44,6 @@ class MapillarySegmentation(SegmentationDataset):
     VALID_CLASS = list(range(NUM_CLASS))
     KEY = KEY
     LABEL_MAP = {i:KEY[i] for i in range(66)}
-    print('label map:' , LABEL_MAP)
 
     def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
         super(MapillarySegmentation, self).__init__(root, split, mode, transform, **kwargs)

@@ -102,7 +102,7 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
         out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
     for i in unique:
-        count[i] = (npimg == i)
+        count[i] = np.sum((npimg == i))
     print('count:  ', count)
     print('hist:  ', hist)
     print('unique:  ', unique)
