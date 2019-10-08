@@ -17,7 +17,7 @@ parser = argparse.ArgumentParser(
     description='Predict segmentation result from a given image')
 parser.add_argument('--model', type=str, default='fcn32s_vgg16_voc',
                     help='model name (default: fcn32_vgg16)')
-parser.add_argument('--dataset', type=str, default='pascal_aug', choices=['pascal_voc','pascal_aug','ade20k','citys'],
+parser.add_argument('--dataset', type=str, default='pascal_aug', choices=['pascal_voc','pascal_aug','ade20k','citys','mapillary'],
                     help='dataset name (default: pascal_voc)')
 parser.add_argument('--save-folder', default='~/.torch/models',
                     help='Directory for saving checkpoint models')
@@ -60,6 +60,7 @@ def demo(config):
             output = model(images)
             # torch.cuda.synchronize()\\
             print('____time %.2fs'%(time.time()-sstart))
+            print('out size:', output.size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
             outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
