@@ -92,7 +92,7 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     i_flag = True if dataset == 'mapillary' else False
     num_class = 10 if i_flag else 19
     for i in range(num_class):
-        k = datasets[dataset]._label_map[i]+1 if i_flag else i
+        k = datasets[dataset].KEY[i]+1 if i_flag else i
         index = (npimg == k)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
