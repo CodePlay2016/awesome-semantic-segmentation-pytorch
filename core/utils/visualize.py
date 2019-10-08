@@ -75,7 +75,8 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         out_img.putpalette(adepallete)
         return out_img
     elif dataset in ['citys', 'mapillary']:
-        pallete = cityspallete if dataset == 'citys' else mapillarypallete
+        # pallete = cityspallete if dataset == 'citys' else mapillarypallete
+        pallete = cityspallete if dataset == 'citys' else _getvocpallete(66)
         npimg = putpalette(npimg, pallete, dataset)
         out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
@@ -96,7 +97,8 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     count = dict({})
     print('pixel:', npimg[340,369])
     for i in range(num_class):
-        k = datasets[dataset].KEY[i]+1 if i_flag else i
+        # k = datasets[dataset].KEY[i]+1 if i_flag else i
+        k = i
         index = (npimg == i)
         count[i] = np.sum(index)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
