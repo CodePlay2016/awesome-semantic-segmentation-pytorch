@@ -91,12 +91,15 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
     i_flag = True if dataset == 'mapillary' else False
     num_class = 10 if i_flag else 19
+    count = dict({})
     for i in range(num_class):
         k = datasets[dataset].KEY[i]+1 if i_flag else i
         index = (npimg == k)
+        count[i] = np.sum(index)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
         out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
+    print('count:  ', count)
     img = np.stack([out_r, out_g, out_b], axis=-1)
     return img
 
