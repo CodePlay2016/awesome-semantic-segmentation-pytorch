@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
+from ..data.dataloader import datasets
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
            'show_prediction', 'show_colorful_images', 'save_colorful_images']
@@ -73,29 +74,29 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         out_img = Image.fromarray(npimg.astype('uint8'))
         out_img.putpalette(adepallete)
         return out_img
-    elif dataset == 'citys':
-        npimg = putpalette(npimg, cityspallete)
-        out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
-        return out_img
-    elif dataset == 'mapillary':
-        npimg = putpalette(npimg, mapillarypallete)
+    elif dataset in ['citys', 'mapillary']:
+        pallete = cityspallete if dataset == 'citys' else mapillarypallete
+        npimg = putpalette(npimg, pallete, dataset)
         out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
     return out_img
 
-def putpalette(npimg, palette):
+def putpalette(npimg, pallete, dataset='pascal_voc'):
     img = npimg
     # npimg = np.array(img.getdata()).reshape(img.size[0], img.size[1])
     out_r = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_g = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
-    for i in range(19):
-        index = (npimg == i)
-        out_r = np.where(index, np.ones_like(out_r) * cityspallete[3*i], out_r)
-        out_g = np.where(index, np.ones_like(out_r) * cityspallete[3*i+1], out_g)
-        out_b = np.where(index, np.ones_like(out_r) * cityspallete[3*i+2], out_b)
+    i_flag = True if dataset == 'mapillary' else False
+    num_class = 10 if i_flag else 19
+    for i in range(num_class):
+        k = datasets[dataset]._label_map[i]+1 if i_flag else i
+        index = (npimg == k)
+        out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
+        out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
+        out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
     img = np.stack([out_r, out_g, out_b], axis=-1)
     return img
 

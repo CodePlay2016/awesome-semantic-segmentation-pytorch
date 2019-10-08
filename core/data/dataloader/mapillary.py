@@ -33,7 +33,7 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    USE_FULL_LABEL = False
+    USE_FULL_LABEL = True
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
 
@@ -45,6 +45,7 @@ class MapillarySegmentation(SegmentationDataset):
         assert (len(self.images) == len(self.mask_paths))
         if len(self.images) == 0:
             raise RuntimeError("Found 0 images in subfolders of:" + root + "\n")
+
         self.valid_classes = [ 2,  3,  4,  5,  7,  8,  9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22,
                               23, 24, 29, 34, 36, 38, 41, 42, 43, 45, 47, 51, 52, 53, 54, 55, 56,
                               57, 58, 59, 60, 61, 62]
@@ -55,6 +56,7 @@ class MapillarySegmentation(SegmentationDataset):
                               -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
                               -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
                               4, 4, 4, -1, -1, -1])
+        self._label_map = {i:self._key[i] for i in range(66)}
         # self._key = np.arange(0, self.NUM_CLASS)
         self._mapping = np.array(range(0, len(self._key))).astype('int32')
 
