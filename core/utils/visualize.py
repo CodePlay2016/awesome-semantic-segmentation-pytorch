@@ -81,6 +81,7 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
     out_img.putpalette(vocpallete)
+    print('error!?')
     return out_img
 
 def putpalette(npimg, pallete, dataset='pascal_voc'):
@@ -90,17 +91,18 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     out_g = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
     i_flag = True if dataset == 'mapillary' else False
-    num_class = 10 if i_flag else 19
+    num_class = datasets[dataset].NUM_CLASS if i_flag else 19
     unique = np.unique(npimg)
     hist = np.histogram(npimg)
     count = dict({})
     for i in range(num_class):
         k = datasets[dataset].KEY[i]+1 if i_flag else i
-        index = (npimg == k)
-        count[i] = np.sum(index)
+        index = (npimg == i)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
         out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
+    for i in unique:
+        count[i] = (npimg == i)
     print('count:  ', count)
     print('hist:  ', hist)
     print('unique:  ', unique)
