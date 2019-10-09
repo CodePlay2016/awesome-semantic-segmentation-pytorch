@@ -10,7 +10,7 @@ __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deep
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
            'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet101_mapillary']
 
-INTERPOLATE_MODE = 'nearest' # nearest or bilinear
+INTERPOLATE_MODE = 'linear' # linear | bilinear | bicubic | trilinear
 
 class DeepLabV3(SegBaseModel):
     r"""DeepLabV3
