@@ -10,6 +10,7 @@ __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deep
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
            'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet101_mapillary']
 
+INTERPOLATE_MODE = 'nearest' # nearest or bilinear
 
 class DeepLabV3(SegBaseModel):
     r"""DeepLabV3
@@ -45,12 +46,12 @@ class DeepLabV3(SegBaseModel):
         _, _, c3, c4 = self.base_forward(x)
         outputs = []
         x = self.head(c4)
-        x = F.interpolate(x, size, mode='bilinear', align_corners=True)
+        x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=True)
         outputs.append(x)
 
         if self.aux:
             auxout = self.auxlayer(c3)
-            auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
+            auxout = F.interpolate(auxout, size, mode=INTERPOLATE_MODE, align_corners=True)
             outputs.append(auxout)
         return tuple(outputs)
 

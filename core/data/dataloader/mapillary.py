@@ -39,7 +39,7 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    USE_FULL_LABEL = False
+    USE_FULL_LABEL = True
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
     KEY = KEY
@@ -53,12 +53,14 @@ class MapillarySegmentation(SegmentationDataset):
         assert (len(self.images) == len(self.mask_paths))
         if len(self.images) == 0:
             raise RuntimeError("Found 0 images in subfolders of:" + root + "\n")
-        self.valid_classes = [ 2,  3,  4,  5,  7,  8,  9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22,
-                              23, 24, 29, 34, 36, 38, 41, 42, 43, 45, 47, 51, 52, 53, 54, 55, 56,
-                              57, 58, 59, 60, 61, 62]
-        self._key = np.array(self.KEY)
-        # self._key = np.arange(0, self.NUM_CLASS)
-        self._mapping = np.array(range(0, len(self._key))).astype('int32')
+        if not self.USE_FULL_LABEL:
+            self.valid_classes = [ 2,  3,  4,  5,  7,  8,  9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22,
+                                  23, 24, 29, 34, 36, 38, 41, 42, 43, 45, 47, 51, 52, 53, 54, 55, 56,
+                                  57, 58, 59, 60, 61, 62]
+            self._key = np.array(self.KEY)
+        else:
+            self._key = np.arange(0, self.NUM_CLASS)
+            self._mapping = np.array(range(0, len(self._key))).astype('int32')
 
     def _class_to_index(self, mask):
         # assert the value
