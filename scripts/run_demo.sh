@@ -3,7 +3,7 @@ CUDA_VISIBLE_DEVICE=2 python demo.py \
     --model deeplabv3_resnet101_mapillary \
     --save-folder ../model/mapillary_selected \
     --dataset mapillary \
-    --input-pic ../datasets/mapillary/testing/images/0GARsxEdQfiSm_tbnt_Ygg.jpg \
+    --input-pic ../datasets/mapillary/testing/images/01C9HdKM26NXzPEnlzH2Xw.jpg \
     --out-dir /home/hufq/eval_selected \
     --repetition 1
 # for img in '/home/hufq/data/apollo_selected'/*5.jpg
