@@ -75,8 +75,8 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         out_img.putpalette(adepallete)
         return out_img
     elif dataset in ['citys', 'mapillary']:
-        # pallete = cityspallete if dataset == 'citys' else mapillarypallete
-        pallete = cityspallete if dataset == 'citys' else _getvocpallete(66)
+        pallete = cityspallete if dataset == 'citys' else mapillarypallete
+        # pallete = cityspallete if dataset == 'citys' else _getvocpallete(66)
         npimg = putpalette(npimg, pallete, dataset)
         out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
