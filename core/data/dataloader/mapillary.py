@@ -39,7 +39,7 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    USE_FULL_LABEL = True
+    USE_FULL_LABEL = False
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
     KEY = KEY
