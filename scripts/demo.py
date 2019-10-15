@@ -81,7 +81,7 @@ def demo(config):
         total =len(filenames)
         if config.demo_dir:
             for ii, filename in enumerate(filenames):
-                print("%d, %s"%(ii, filename), end='')
+                print("%d/%d, %s"%(ii,total, filename), end='')
                 sys.stdout.flush()
                 image = Image.open(filename).convert('RGB')
                 images = transform(image).unsqueeze(0).to(device)
