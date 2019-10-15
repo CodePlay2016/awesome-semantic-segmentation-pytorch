@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 import argparse
 import time
 import torch
@@ -22,6 +23,11 @@ parser.add_argument('--dataset', type=str, default='pascal_aug', choices=['pasca
 parser.add_argument('--save-folder', default='~/.torch/models',
                     help='Directory for saving checkpoint models')
 parser.add_argument('--input-pic', type=str, default='../datasets/voc/VOC2012/JPEGImages/2007_000032.jpg',
+                    help='path to the input picture')
+parser.add_argument('--demo-dir', action='store_true', default=False)
+parser.add_argument('--make-transparent', action='store_true', default=False)
+parser.add_argument('--alpha', type=int, defualt=0.5)
+parser.add_argument('--input-dir', type=str, default='../datasets/mapillary/testing/images',
                     help='path to the input picture')
 parser.add_argument('--out-dir', default='./eval', type=str,
                     help='path to save the predict result')
@@ -52,6 +58,7 @@ def demo(config):
     ])
     image = Image.open(config.input_pic).convert('RGB')
     images = transform(image).unsqueeze(0).to(device)
+    prefix = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + "_"
 
     with torch.no_grad():
         start = time.time()
@@ -63,9 +70,29 @@ def demo(config):
             print('out size:', output[0].size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
-            outname = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + config.model + '.png'
-            mask.save(os.path.join(config.out_dir, outname))
+            pred_img = Image.fromarray(pred.astype('uint8'), 'RGB')
+            outname_mask = prefix + config.model + '_out.png'
+            outname_pred = prefix + config.model + '_raw.png'
+            mask.save(os.path.join(config.out_dir, outname_mask))
+            pred.save(os.path.join(config.out_dir, outname_pred))
         elapse = time.time() - start
+
+        if config.demo_dir:
+            for filename in glob.glob(os.path.join(config.input_dir, "*.jpg")):
+                image = Image.open(filename).convert('RGB')
+                images = transform(image).unsqueeze(0).to(device)
+                output = model(images)
+                pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+                mask = get_color_pallete_c(pred, config.dataset)
+                pred_img = Image.fromarray(pred.astype('uint8'), 'RGB')
+                prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
+                outname_mask = prefix + config.model + '_out.png'
+                outname_pred = prefix + config.model + '_raw.png'
+                mask.save(os.path.join(config.out_dir, outname_mask))
+                pred.save(os.path.join(config.out_dir, outname_pred))
+
+
+
     print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
 
 if __name__ == '__main__':
