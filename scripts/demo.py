@@ -1,4 +1,5 @@
 import os
+import pdb
 import sys
 import glob
 import argparse
@@ -70,8 +71,9 @@ def demo(config):
             print('out size:', output[0].size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
-            print(pred_img.shape)
-            pred_img = Image.fromarray(pred.astype('uint8'), 'RGB')
+            pred_img = pred.astype('uint8')
+            pdb.set_trace()
+            pred_img = Image.fromarray(pred_img, 'RGB')
             outname_mask = prefix + config.model + '_out.png'
             outname_pred = prefix + config.model + '_raw.png'
             mask.save(os.path.join(config.out_dir, outname_mask))
