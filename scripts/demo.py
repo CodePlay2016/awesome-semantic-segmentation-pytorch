@@ -74,7 +74,7 @@ def demo(config):
             outname_mask = prefix + config.model + '_out.png'
             outname_pred = prefix + config.model + '_raw.png'
             mask.save(os.path.join(config.out_dir, outname_mask))
-            pred.save(os.path.join(config.out_dir, outname_pred))
+            pred_img.save(os.path.join(config.out_dir, outname_pred))
         elapse = time.time() - start
 
         filenames = glob.glob(os.path.join(config.input_dir, "*.jpg"))
@@ -93,7 +93,7 @@ def demo(config):
                 outname_mask = prefix + config.model + '_out.png'
                 outname_pred = prefix + config.model + '_raw.png'
                 mask.save(os.path.join(config.out_dir, outname_mask))
-                pred.save(os.path.join(config.out_dir, outname_pred))
+                pred_img.save(os.path.join(config.out_dir, outname_pred))
 
 
 
