@@ -70,6 +70,7 @@ def demo(config):
             print('out size:', output[0].size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
+            print(pred_img.shape)
             pred_img = Image.fromarray(pred.astype('uint8'), 'RGB')
             outname_mask = prefix + config.model + '_out.png'
             outname_pred = prefix + config.model + '_raw.png'

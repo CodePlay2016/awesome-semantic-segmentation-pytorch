@@ -103,8 +103,8 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
         out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
-    print('count:  ', count)
-    print('unique:  ', unique)
+    # print('count:  ', count)
+    # print('unique:  ', unique)
     img = np.stack([out_r, out_g, out_b], axis=-1)
     return img
 
