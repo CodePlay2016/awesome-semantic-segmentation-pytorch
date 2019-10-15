@@ -72,8 +72,7 @@ def demo(config):
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
             pred_img = pred.astype('uint8')
-            pdb.set_trace()
-            pred_img = Image.fromarray(pred_img, 'RGB')
+            pred_img = Image.fromarray(pred_img)
             outname_mask = prefix + config.model + '_out.png'
             outname_pred = prefix + config.model + '_raw.png'
             mask.save(os.path.join(config.out_dir, outname_mask))
@@ -91,7 +90,7 @@ def demo(config):
                 output = model(images)
                 pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
                 mask = get_color_pallete_c(pred, config.dataset)
-                pred_img = Image.fromarray(pred.astype('uint8'), 'RGB')
+                pred_img = Image.fromarray(pred.astype('uint8'))
                 prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
                 outname_mask = prefix + config.model + '_out.png'
                 outname_pred = prefix + config.model + '_raw.png'
