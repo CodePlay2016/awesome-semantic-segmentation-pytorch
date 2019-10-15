@@ -4,7 +4,8 @@ CUDA_VISIBLE_DEVICE=3 python demo.py \
     --save-folder ../model/mapillary_selected \
     --dataset mapillary \
     --input-pic ../datasets/mapillary/testing/images/01C9HdKM26NXzPEnlzH2Xw.jpg \
-    --input-dir ../datasets/mapillary/testing/images/
+    --demo-dir \
+    --input-dir ../datasets/mapillary/testing/images/ \
     --out-dir /home/hufq/eval_selected \
     --repetition 1
 # for img in '/home/hufq/data/apollo_selected'/*5.jpg
