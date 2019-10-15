@@ -26,7 +26,7 @@ parser.add_argument('--input-pic', type=str, default='../datasets/voc/VOC2012/JP
                     help='path to the input picture')
 parser.add_argument('--demo-dir', action='store_true', default=False)
 parser.add_argument('--make-transparent', action='store_true', default=False)
-parser.add_argument('--alpha', type=int, defualt=0.5)
+parser.add_argument('--alpha', type=int, default=0.5)
 parser.add_argument('--input-dir', type=str, default='../datasets/mapillary/testing/images',
                     help='path to the input picture')
 parser.add_argument('--out-dir', default='./eval', type=str,
@@ -77,8 +77,12 @@ def demo(config):
             pred.save(os.path.join(config.out_dir, outname_pred))
         elapse = time.time() - start
 
+        filenames = glob.glob(os.path.join(config.input_dir, "*.jpg"))
+        total =len(filenames)
         if config.demo_dir:
-            for filename in glob.glob(os.path.join(config.input_dir, "*.jpg")):
+            for ii, filename in enumerate(filenames):
+                print("%d, %s"%(ii, filename), end='')
+                sys.stdout.flush()
                 image = Image.open(filename).convert('RGB')
                 images = transform(image).unsqueeze(0).to(device)
                 output = model(images)
