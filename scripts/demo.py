@@ -83,8 +83,7 @@ def demo(config):
         total =len(filenames)
         if config.demo_dir:
             for ii, filename in enumerate(filenames):
-                print("%d/%d, %s"%(ii,total, filename), end='')
-                sys.stdout.flush()
+                print("\r%d/%d, %s"%(ii,total, filename), end='', flush=True)
                 image = Image.open(filename).convert('RGB')
                 images = transform(image).unsqueeze(0).to(device)
                 output = model(images)
