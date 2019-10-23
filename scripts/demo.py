@@ -65,7 +65,6 @@ def demo(config):
         os.mkdir(config.out_dir)
 
     with torch.no_grad():
-        start = time.time()
         for _ in range(REP):
             sstart = time.time()
             output = model(images)
@@ -73,6 +72,7 @@ def demo(config):
             # print('____time %.2fs'%(time.time()-sstart))
             # print('out size:', output[0].size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+            start = time.time()
             mask = get_color_pallete_c(pred, config.dataset)
             pred_img = pred.astype('uint8')
             pred_img = Image.fromarray(pred_img)
@@ -80,12 +80,12 @@ def demo(config):
             outname_pred = prefix + config.model + '_raw.png'
             mask.save(os.path.join(config.out_dir, outname_mask))
             pred_img.save(os.path.join(config.out_dir, outname_pred))
-        elapse = time.time() - start
+            elapse = time.time() - start
 
         if config.demo_dir is not None:
             print("start dir demoing...")
-            filenames = glob.glob(os.path.join(config.demo_dir, "*.jpg"))
-            total =len(filenames)
+            filenames = glob.glob(config.demo_dir)
+            total = len(filenames)
             for ii, filename in enumerate(filenames):
                 sys.stdout.write("\r%d/%d, %s" % (ii, total, filename))
                 sys.stdout.flush()
