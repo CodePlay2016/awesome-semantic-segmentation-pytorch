@@ -96,8 +96,8 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
     unique = np.unique(npimg)
     count = dict({})
     for i in range(num_class):
-        # k = datasets[dataset].KEY[i]+1 if i_flag else i
-        k = i
+        k = datasets[dataset].KEY[i]+1 if i_flag else i
+        # k = i
         index = (npimg == i)
         count[i] = np.sum(index)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
