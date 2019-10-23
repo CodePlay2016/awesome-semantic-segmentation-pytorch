@@ -25,7 +25,7 @@ parser.add_argument('--save-folder', default='~/.torch/models',
                     help='Directory for saving checkpoint models')
 parser.add_argument('--input-pic', type=str, default='../datasets/voc/VOC2012/JPEGImages/2007_000032.jpg',
                     help='path to the input picture')
-parser.add_argument('--demo-dir', action='store_true', default=False)
+parser.add_argument('--demo-dir', type=str, default=None, help="whether to show a directory of images")
 parser.add_argument('--make-transparent', action='store_true', default=False)
 parser.add_argument('--alpha', type=int, default=0.5)
 parser.add_argument('--input-dir', type=str, default='../datasets/mapillary/testing/images',
@@ -61,6 +61,9 @@ def demo(config):
     images = transform(image).unsqueeze(0).to(device)
     prefix = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + "_"
 
+    if not os.path.exists(config.out_dir):
+        os.mkdir(config.out_dir)
+
     with torch.no_grad():
         start = time.time()
         for _ in range(REP):
@@ -79,9 +82,9 @@ def demo(config):
             pred_img.save(os.path.join(config.out_dir, outname_pred))
         elapse = time.time() - start
 
-        filenames = glob.glob(os.path.join(config.input_dir, "*.jpg"))
-        total =len(filenames)
-        if config.demo_dir:
+        if config.demo_dir is not None:
+            filenames = glob.glob(os.path.join(config.demo_dir, "*.jpg"))
+            total =len(filenames)
             for ii, filename in enumerate(filenames):
                 print("\r%d/%d, %s"%(ii,total, filename), end='', flush=True)
                 image = Image.open(filename).convert('RGB')
