@@ -196,37 +196,46 @@ cityspallete = [
     119, 11, 32,
 ]
 
+# mapillarypallete = [128, 64, 128,
+#                     244, 35, 232,
+#                     70, 70, 70,
+#                     102, 102, 156,
+#                     190, 153, 153,
+#                     153, 153, 153,
+#                     250, 170, 30,
+#                     220, 220, 0,
+#                     107, 142, 35,
+#                     152, 251, 152,
+#                     255, 0, 0]
+
 mapillarypallete = [128, 64, 128,
-                    244, 35, 232,
-                    70, 70, 70,
-                    102, 102, 156,
-                    190, 153, 153,
-                    153, 153, 153,
-                    250, 170, 30,
                     220, 220, 0,
-                    107, 142, 35,
-                    152, 251, 152,
-                    255, 0, 0]
-
-
-
+                    0, 255, 255,
+                    0, 0, 255,
+                    255, 255, 0,
+                    255, 0, 255,
+                    0, 0, 0,
+                    0, 0, 0,
+                    0, 255, 255,
+                    0, 0, 0,
+                    0, 0, 0]
 
 if __name__ == "__main__":
     import cv2
     def draw_color_map(pallete):
         num_color = int(len(pallete) / 3)
         width = 32
-        shape = (width, num_color*width, 3)
+        shape = (num_color*width, width, 3)
         out_r = np.zeros((shape[0], shape[1]), dtype=np.uint8)
         out_g = np.zeros((shape[0], shape[1]), dtype=np.uint8)
         out_b = np.zeros((shape[0], shape[1]), dtype=np.uint8)
         for i in range(-1, num_color):
-            out_r[:, i*width:i*width+width-1] = pallete[3 * i]
-            out_g[:, i*width:i*width+width-1] = pallete[3 * i + 1]
-            out_b[:, i*width:i*width+width-1] = pallete[3 * i + 2]
+            out_r[i*width:i*width+width-1, :] = pallete[3 * i]
+            out_g[i*width:i*width+width-1, :] = pallete[3 * i + 1]
+            out_b[i*width:i*width+width-1, :] = pallete[3 * i + 2]
         img = np.stack([out_r, out_g, out_b], axis=-1)
         img = Image.fromarray(img)
         return img
-    img = draw_color_map(cityspallete)
+    img = draw_color_map(mapillarypallete)
     img.save("/Users/hufangquan/color_map.png")
     print('a')

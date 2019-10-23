@@ -88,7 +88,7 @@ def demo(config):
             filenames = glob.glob(config.demo_dir)
             total = len(filenames)
             for ii, filename in enumerate(filenames):
-                sys.stdout.write("\r%d/%d, %s" % (ii, total, filename))
+                sys.stdout.write("\r%d/%d, %s" % (ii+1, total, filename))
                 sys.stdout.flush()
                 image = Image.open(filename).convert('RGB')
                 images = transform(image).unsqueeze(0).to(device)
@@ -97,9 +97,9 @@ def demo(config):
                 mask = get_color_pallete_c(pred, config.dataset)
                 prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
                 outname_mask = prefix + config.model + '_out.png'
-                outname_pred = prefix + config.model + '_raw.np'
+                outname_pred = prefix + config.model + '_raw'
                 mask.save(os.path.join(config.out_dir, outname_mask))
-                np.save(os.path.join(config.out_dir, outname_pred), pred)
+                np.save(os.path.join(config.out_dir, outname_pred), pred.astype(np.int8))
         print("finish")
 
 
