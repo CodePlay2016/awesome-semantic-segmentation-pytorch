@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image
-from ..data.dataloader import datasets
+# from ..data.dataloader import datasets
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
            'show_prediction', 'show_colorful_images', 'save_colorful_images']
@@ -86,14 +86,11 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
     return out_img
 
 def putpalette(npimg, pallete, dataset='pascal_voc'):
-    img = npimg
-    # npimg = np.array(img.getdata()).reshape(img.size[0], img.size[1])
     out_r = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_g = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
     i_flag = True if dataset == 'mapillary' else False
     num_class = datasets[dataset].NUM_CLASS if i_flag else 19
-    unique = np.unique(npimg)
     count = dict({})
     for i in range(num_class):
         k = datasets[dataset].KEY[i]+1 if i_flag else i
@@ -103,8 +100,6 @@ def putpalette(npimg, pallete, dataset='pascal_voc'):
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
         out_g = np.where(index, np.ones_like(out_r) * pallete[3*k+1], out_g)
         out_b = np.where(index, np.ones_like(out_r) * pallete[3*k+2], out_b)
-    # print('count:  ', count)
-    # print('unique:  ', unique)
     img = np.stack([out_r, out_g, out_b], axis=-1)
     return img
 
@@ -211,22 +206,27 @@ mapillarypallete = [128, 64, 128,
                     220, 220, 0,
                     107, 142, 35,
                     152, 251, 152,
-                    0, 130, 180,
-                    220, 20, 60,
-                    255, 0, 0,
-                    0, 0, 142,
-                    0, 0, 70,
-                    0, 60, 100,
-                    0, 80, 100,
-                    0, 0, 230,
-                    119, 11, 32,]
+                    255, 0, 0]
+
+
+
 
 if __name__ == "__main__":
-    img_path = "/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/CityScape/visualization/berlin_000192_000019_pred.png"
     import cv2
-    img_cv = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    img = Image.open(img_path)
-    npimg = np.array(img)
-    img_p = get_color_pallete(npimg, dataset='citys')
-    img_pc = get_color_pallete_c(npimg, dataset='citys')
+    def draw_color_map(pallete):
+        num_color = int(len(pallete) / 3)
+        width = 32
+        shape = (width, num_color*width, 3)
+        out_r = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+        out_g = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+        out_b = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+        for i in range(-1, num_color):
+            out_r[:, i*width:i*width+width-1] = pallete[3 * i]
+            out_g[:, i*width:i*width+width-1] = pallete[3 * i + 1]
+            out_b[:, i*width:i*width+width-1] = pallete[3 * i + 2]
+        img = np.stack([out_r, out_g, out_b], axis=-1)
+        img = Image.fromarray(img)
+        return img
+    img = draw_color_map(cityspallete)
+    img.save("/Users/hufangquan/color_map.png")
     print('a')
