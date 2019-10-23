@@ -95,7 +95,6 @@ def demo(config):
                 output = model(images)
                 pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
                 mask = get_color_pallete_c(pred, config.dataset)
-                pred_img = pred.save
                 prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
                 outname_mask = prefix + config.model + '_out.png'
                 outname_pred = prefix + config.model + '_raw.np'
@@ -104,7 +103,7 @@ def demo(config):
         print("finish")
 
 
-    print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
+    # print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
 
 if __name__ == '__main__':
     demo(args)
