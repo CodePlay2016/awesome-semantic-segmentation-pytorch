@@ -70,8 +70,8 @@ def demo(config):
             sstart = time.time()
             output = model(images)
             # torch.cuda.synchronize()\\
-            print('____time %.2fs'%(time.time()-sstart))
-            print('out size:', output[0].size())
+            # print('____time %.2fs'%(time.time()-sstart))
+            # print('out size:', output[0].size())
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             mask = get_color_pallete_c(pred, config.dataset)
             pred_img = pred.astype('uint8')
@@ -83,10 +83,12 @@ def demo(config):
         elapse = time.time() - start
 
         if config.demo_dir is not None:
+            print("start dir demoing...")
             filenames = glob.glob(os.path.join(config.demo_dir, "*.jpg"))
             total =len(filenames)
             for ii, filename in enumerate(filenames):
-                print("\r%d/%d, %s"%(ii,total, filename), end='', flush=True)
+                sys.stdout.write("\r%d/%d, %s" % (ii, total, filename))
+                sys.stdout.flush()
                 image = Image.open(filename).convert('RGB')
                 images = transform(image).unsqueeze(0).to(device)
                 output = model(images)
@@ -98,7 +100,7 @@ def demo(config):
                 outname_pred = prefix + config.model + '_raw.png'
                 mask.save(os.path.join(config.out_dir, outname_mask))
                 pred_img.save(os.path.join(config.out_dir, outname_pred))
-
+        print("finish")
 
 
     print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
