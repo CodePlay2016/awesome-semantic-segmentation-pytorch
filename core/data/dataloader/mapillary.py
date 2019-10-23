@@ -39,7 +39,7 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    USE_FULL_LABEL = False
+    USE_FULL_LABEL = True
     NUM_CLASS = 66 if USE_FULL_LABEL else 10
     VALID_CLASS = list(range(NUM_CLASS))
     KEY = KEY
@@ -58,7 +58,9 @@ class MapillarySegmentation(SegmentationDataset):
                                   23, 24, 29, 34, 36, 38, 41, 42, 43, 45, 47, 51, 52, 53, 54, 55, 56,
                                   57, 58, 59, 60, 61, 62]
             self._key = np.array(self.KEY)
+            self._mapping = np.array(range(0, len(self._key))).astype('int32')
         else:
+            self.valid_classes = list(range(0, self.NUM_CLASS))
             self._key = np.arange(0, self.NUM_CLASS)
             self._mapping = np.array(range(0, len(self._key))).astype('int32')
 
