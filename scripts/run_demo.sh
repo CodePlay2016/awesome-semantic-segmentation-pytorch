@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=3 python demo.py \
     --save-folder ../model/ \
     --dataset mapillary \
     --input-pic ../datasets/mapillary/testing/images/01C9HdKM26NXzPEnlzH2Xw.jpg \
-    --demo-dir /home/hufq/LOD/fish_eye_correct/*.png \
+    --demo-dir "/home/hufq/LOD/fish_eye_correct/*.png" \
     --out-dir /home/hufq/eval_fish_eye_correct \
     --repetition 1
 # for img in '/home/hufq/data/apollo_selected'/*5.jpg
