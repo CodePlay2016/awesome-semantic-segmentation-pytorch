@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image, ImageDraw
-from ..data.dataloader import datasets
+# from ..data.dataloader import datasets
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
            'show_prediction', 'show_colorful_images', 'save_colorful_images']
@@ -217,7 +217,7 @@ mapillarypallete = [128, 64, 128,
                     220, 220, 0,
                     0, 255, 255,
                     0, 0, 255,
-                    255, 255, 0,
+                    255, 0, 0,
                     255, 0, 255,
                     0, 0, 0,
                     0, 0, 0,
