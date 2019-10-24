@@ -95,7 +95,7 @@ def putpalette(npimg, pallete_name, dataset='pascal_voc'):
     count = dict({})
     for i in range(num_class):
         if dataset == "mapillary" and pallete_name == "mapillary":
-            k = datasets[dataset].KEY[i]+1
+            k = datasets[dataset].KEY[i]
         else:
             k = i
         index = (npimg == i)
@@ -248,8 +248,11 @@ if __name__ == "__main__":
         img = Image.fromarray(img)
         d = ImageDraw.Draw(img)
         for i in range(-1, num_color):
-            d.text((int(i*width+1/2*width), 16), str(i), fill=(255,255,255))
+            coord = (int(i*width+1/2*width), 16)
+            d.text(coord, str(i), fill=(255,255,255))
+            print(coord)
         return img
     img = draw_color_map(mapillarypallete)
     img.save("/Users/hufangquan/color_map.png")
-    print('a')
+    npimg = np.load("/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/fisheye_data/eval_fish_eye_correct/snapshot_14_5120x720_F_deeplabv3_resnet101_mapillary_raw.npy")
+    print('finish')
