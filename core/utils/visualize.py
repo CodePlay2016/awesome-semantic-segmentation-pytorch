@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from ..data.dataloader import datasets
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
@@ -64,7 +64,10 @@ def save_colorful_images(prediction, filename, output_dir, palettes):
     im.save(fn)
 
 
-def get_color_pallete_c(npimg, dataset='pascal_voc'):
+#############################################################
+# input numpy prediction, output color mask image
+#############################################################
+def get_color_pallete_c(npimg, pallete_name, dataset='pascal_voc'):
     # recovery boundary
     if dataset in ('pascal_voc', 'pascal_aug'):
         npimg[npimg == -1] = 255
@@ -75,9 +78,7 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
         out_img.putpalette(adepallete)
         return out_img
     elif dataset in ['citys', 'mapillary']:
-        pallete = cityspallete if dataset == 'citys' else mapillarypallete
-        # pallete = cityspallete if dataset == 'citys' else _getvocpallete(66)
-        npimg = putpalette(npimg, pallete, dataset)
+        npimg = putpalette(npimg, pallete_name, dataset)
         out_img = Image.fromarray(npimg.astype('uint8'), 'RGB')
         return out_img
     out_img = Image.fromarray(npimg.astype('uint8'))
@@ -85,16 +86,18 @@ def get_color_pallete_c(npimg, dataset='pascal_voc'):
     print('error!?')
     return out_img
 
-def putpalette(npimg, pallete, dataset='pascal_voc'):
+def putpalette(npimg, pallete_name, dataset='pascal_voc'):
+    pallete = pallete_map[pallete_name]
     out_r = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_g = np.zeros((npimg.shape[0], npimg.shape[1]))
     out_b = np.zeros((npimg.shape[0], npimg.shape[1]))
-    i_flag = True if dataset == 'mapillary' else False
-    num_class = datasets[dataset].NUM_CLASS if i_flag else 19
+    num_class = datasets[dataset].NUM_CLASS
     count = dict({})
     for i in range(num_class):
-        k = datasets[dataset].KEY[i]+1 if i_flag else i
-        # k = i
+        if dataset == "mapillary" and pallete_name == "mapillary":
+            k = datasets[dataset].KEY[i]+1
+        else:
+            k = i
         index = (npimg == i)
         count[i] = np.sum(index)
         out_r = np.where(index, np.ones_like(out_r) * pallete[3*k], out_r)
@@ -153,6 +156,8 @@ def _getvocpallete(num_cls):
 
 
 vocpallete = _getvocpallete(256)
+
+vocpallete66 = _getvocpallete(66)
 
 adepallete = [
     0, 0, 0, 120, 120, 120, 180, 120, 120, 6, 230, 230, 80, 50, 50, 4, 200, 3, 120, 120, 80, 140, 140, 140, 204,
@@ -220,6 +225,12 @@ mapillarypallete = [128, 64, 128,
                     0, 0, 0,
                     0, 0, 0]
 
+pallete_map = {
+    "voc66": vocpallete66,
+    "mapillary": mapillarypallete,
+    "cityscapes": cityspallete
+}
+
 if __name__ == "__main__":
     import cv2
     def draw_color_map(pallete):
@@ -235,6 +246,9 @@ if __name__ == "__main__":
             out_b[i*width:i*width+width-1, :] = pallete[3 * i + 2]
         img = np.stack([out_r, out_g, out_b], axis=-1)
         img = Image.fromarray(img)
+        d = ImageDraw.Draw(img)
+        for i in range(-1, num_color):
+            d.text((int(i*width+1/2*width), 16), str(i), fill=(255,255,255))
         return img
     img = draw_color_map(mapillarypallete)
     img.save("/Users/hufangquan/color_map.png")

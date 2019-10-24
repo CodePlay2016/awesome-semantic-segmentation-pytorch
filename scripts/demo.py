@@ -94,11 +94,14 @@ def demo(config):
                 images = transform(image).unsqueeze(0).to(device)
                 output = model(images)
                 pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-                mask = get_color_pallete_c(pred, config.dataset)
+                mask1 = get_color_pallete_c(pred, "mapillary", config.dataset)
+                mask2 = get_color_pallete_c(pred, "voc66", config.dataset)
                 prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
-                outname_mask = prefix + config.model + '_out.png'
+                outname_mask1 = prefix + config.model + '_out1.png'
+                outname_mask2 = prefix + config.model + '_out2.png'
                 outname_pred = prefix + config.model + '_raw'
-                mask.save(os.path.join(config.out_dir, outname_mask))
+                mask1.save(os.path.join(config.out_dir, outname_mask1))
+                mask2.save(os.path.join(config.out_dir, outname_mask2))
                 np.save(os.path.join(config.out_dir, outname_pred), pred.astype(np.int8))
         print("finish")
 
