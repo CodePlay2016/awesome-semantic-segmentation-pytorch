@@ -201,17 +201,73 @@ cityspallete = [
     119, 11, 32,
 ]
 
-# mapillarypallete = [128, 64, 128,
-#                     244, 35, 232,
-#                     70, 70, 70,
-#                     102, 102, 156,
-#                     190, 153, 153,
-#                     153, 153, 153,
-#                     250, 170, 30,
-#                     220, 220, 0,
-#                     107, 142, 35,
-#                     152, 251, 152,
-#                     255, 0, 0]
+mapillarypallete_full = [[165, 42, 42],
+                     [0, 192, 0],
+                     [196, 196, 196],
+                     [190, 153, 153],
+                     [180, 165, 180],
+                     [90, 120, 150],
+                     [102, 102, 156],
+                     [128, 64, 255],
+                     [140, 140, 200],
+                     [170, 170, 170],
+                     [250, 170, 160],
+                     [96, 96, 96],
+                     [230, 150, 140],
+                     [128, 64, 128],
+                     [110, 110, 110],
+                     [244, 35, 232],
+                     [150, 100, 100],
+                     [70, 70, 70],
+                     [150, 120, 90],
+                     [220, 20, 60],
+                     [255, 0, 0],
+                     [255, 0, 100],
+                     [255, 0, 200],
+                     [200, 128, 128],
+                     [255, 255, 255],
+                     [64, 170, 64],
+                     [230, 160, 50],
+                     [70, 130, 180],
+                     [190, 255, 255],
+                     [152, 251, 152],
+                     [107, 142, 35],
+                     [0, 170, 30],
+                     [255, 255, 128],
+                     [250, 0, 30],
+                     [100, 140, 180],
+                     [220, 220, 220],
+                     [220, 128, 128],
+                     [222, 40, 40],
+                     [100, 170, 30],
+                     [40, 40, 40],
+                     [33, 33, 33],
+                     [100, 128, 160],
+                     [142, 0, 0],
+                     [70, 100, 150],
+                     [210, 170, 100],
+                     [153, 153, 153],
+                     [128, 128, 128],
+                     [0, 0, 80],
+                     [250, 170, 30],
+                     [192, 192, 192],
+                     [220, 220, 0],
+                     [140, 140, 20],
+                     [119, 11, 32],
+                     [150, 0, 255],
+                     [0, 60, 100],
+                     [0, 0, 142],
+                     [0, 0, 90],
+                     [0, 0, 230],
+                     [0, 80, 100],
+                     [128, 64, 64],
+                     [0, 0, 110],
+                     [0, 0, 70],
+                     [0, 0, 192],
+                     [32, 32, 32],
+                     [120, 10, 10]]
+
+mapillarypallete_full = list(np.array(mapillarypallete_full).reshape((-1,)))
 
 mapillarypallete = [0, 0, 0,
                     220, 220, 0,
@@ -228,11 +284,21 @@ mapillarypallete = [0, 0, 0,
 pallete_map = {
     "voc66": vocpallete66,
     "mapillary": mapillarypallete,
-    "cityscapes": cityspallete
+    "cityscapes": cityspallete,
+    "mapillary_full": mapillarypallete_full
 }
 
 if __name__ == "__main__":
+    names = []
+    with open('/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/datasets/MVD/labels.txt', 'rt') as f:
+        lines = f.readlines()
+        for line in lines:
+            if '==' in line: break
+            name = line.split('[')[1].split(']')[0]
+            names.append(name)
+    print(names)
     import cv2
+    import matplotlib.pyplot as plt
     def draw_color_map(pallete):
         num_color = int(len(pallete) / 3)
         width = 32
@@ -248,6 +314,15 @@ if __name__ == "__main__":
         print(img.shape)
         img = Image.fromarray(img)
         d = ImageDraw.Draw(img)
+
+        pallete_np = np.array([[pallete[3*i], pallete[3*i+1], pallete[3*i+2]] for i in range(num_color)],dtype=np.uint8)
+        plt.figure()
+        plt.imshow(pallete_np.reshape((-1,1,3)), interpolation='nearest')
+        # plt.imshow(np.array(img).astype(np.uint8), interpolation='nearest')
+        plt.yticks(range(len(names)), names, fontsize=10)
+        plt.xticks([], [])
+        plt.tick_params(width=0.0)
+        plt.show()
         # for i in range(0, num_color):
         #     coord = (int(i*width+1/2*width), 16)
         #     d.text(coord, str(i), fill=(255,255,255))
@@ -255,7 +330,8 @@ if __name__ == "__main__":
 
         d.text((180, 0), "aaaa", full=(255,255,255))
         return img
-    img = draw_color_map(mapillarypallete)
+    img = draw_color_map(vocpallete66)
     img.save("/Users/hufangquan/color_map.png")
-    npimg = np.load("/Users/hufangquan/self/AIWAYS/projects/Low-obstacle_detection/fisheye_data/eval_fish_eye_correct/snapshot_14_5120x720_F_deeplabv3_resnet101_mapillary_raw.npy")
+
+    npimg = np.load('/Users/hufangquan/self/AIWAYS/自己的周报/20191102/test_changyang_deeplabv3_resnet152_mapillary_raw.npy')
     print('finish')

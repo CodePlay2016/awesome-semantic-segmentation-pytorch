@@ -75,7 +75,7 @@ def demo(config):
             pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
             start = time.time()
             mask1 = get_color_pallete_c(pred, "mapillary", config.dataset)
-            mask2 = get_color_pallete_c(pred, "voc66", config.dataset)
+            mask2 = get_color_pallete_c(pred, "mapillary_full", config.dataset)
             prefix = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + "_"
             outname_mask1 = prefix + config.model + '_out1.png'
             outname_mask2 = prefix + config.model + '_out2.png'
@@ -97,7 +97,7 @@ def demo(config):
                 output = model(images)
                 pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
                 mask1 = get_color_pallete_c(pred, "mapillary", config.dataset)
-                mask2 = get_color_pallete_c(pred, "voc66", config.dataset)
+                mask2 = get_color_pallete_c(pred, "mapillary_full", config.dataset)
                 prefix = os.path.splitext(os.path.split(filename)[-1])[0] + "_"
                 outname_mask1 = prefix + config.model + '_out1.png'
                 outname_mask2 = prefix + config.model + '_out2.png'
