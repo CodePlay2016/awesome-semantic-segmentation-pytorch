@@ -66,22 +66,24 @@ def demo(config):
         os.mkdir(config.out_dir)
 
     with torch.no_grad():
-        # for _ in range(REP):
-        #     sstart = time.time()
-        #     output = model(images)
-        #     # torch.cuda.synchronize()\\
-        #     # print('____time %.2fs'%(time.time()-sstart))
-        #     # print('out size:', output[0].size())
-        #     pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
-        #     start = time.time()
-        #     mask = get_color_pallete_c(pred, config.dataset)
-        #     pred_img = pred.astype('uint8')
-        #     pred_img = Image.fromarray(pred_img)
-        #     outname_mask = prefix + config.model + '_out.png'
-        #     outname_pred = prefix + config.model + '_raw.png'
-        #     mask.save(os.path.join(config.out_dir, outname_mask))
-        #     pred_img.save(os.path.join(config.out_dir, outname_pred))
-        #     elapse = time.time() - start
+        for _ in range(REP):
+            sstart = time.time()
+            output = model(images)
+            # torch.cuda.synchronize()\\
+            # print('____time %.2fs'%(time.time()-sstart))
+            # print('out size:', output[0].size())
+            pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+            start = time.time()
+            mask1 = get_color_pallete_c(pred, "mapillary", config.dataset)
+            mask2 = get_color_pallete_c(pred, "voc66", config.dataset)
+            prefix = os.path.splitext(os.path.split(config.input_pic)[-1])[0] + "_"
+            outname_mask1 = prefix + config.model + '_out1.png'
+            outname_mask2 = prefix + config.model + '_out2.png'
+            outname_pred = prefix + config.model + '_raw'
+            mask1.save(os.path.join(config.out_dir, outname_mask1))
+            mask2.save(os.path.join(config.out_dir, outname_mask2))
+            np.save(os.path.join(config.out_dir, outname_pred), pred.astype(np.int8))
+            elapse = time.time() - start
 
         if config.demo_dir is not None:
             print("start dir demoing...")

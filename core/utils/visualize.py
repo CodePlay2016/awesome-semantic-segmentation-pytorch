@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image, ImageDraw
-from ..data.dataloader import datasets
+# from ..data.dataloader import datasets
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
            'show_prediction', 'show_colorful_images', 'save_colorful_images']
@@ -245,12 +245,15 @@ if __name__ == "__main__":
             out_g[i*width:i*width+width-1, :] = pallete[3 * i + 1]
             out_b[i*width:i*width+width-1, :] = pallete[3 * i + 2]
         img = np.stack([out_r, out_g, out_b], axis=-1)
+        print(img.shape)
         img = Image.fromarray(img)
         d = ImageDraw.Draw(img)
-        for i in range(-1, num_color):
-            coord = (int(i*width+1/2*width), 16)
-            d.text(coord, str(i), fill=(255,255,255))
-            print(coord)
+        # for i in range(0, num_color):
+        #     coord = (int(i*width+1/2*width), 16)
+        #     d.text(coord, str(i), fill=(255,255,255))
+        #     print(coord)
+
+        d.text((180, 0), "aaaa", full=(255,255,255))
         return img
     img = draw_color_map(mapillarypallete)
     img.save("/Users/hufangquan/color_map.png")
