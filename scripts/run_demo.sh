@@ -3,10 +3,10 @@ CUDA_VISIBLE_DEVICES=6 python demo.py \
     --model deeplabv3_resnet152_mapillary \
     --save-folder ../model/mapillary \
     --dataset mapillary \
+    --demo-dir "/home/hufq/CQdata/*.png" \
     --input-pic /home/hufq/test_changyang.png \
-    --out-dir /home/hufq/eval \
+    --out-dir /home/hufq/CQdata/out \
     --repetition 1
-# --demo-dir "/home/hufq/LOD/fish_eye_correct/*.png" \
 # for img in '/home/hufq/data/apollo_selected'/*5.jpg
 # do
 #     python demo.py --model deeplabv3_resnet101_citys --dataset citys --input-pic $img --out-dir /home/hufq/eval
