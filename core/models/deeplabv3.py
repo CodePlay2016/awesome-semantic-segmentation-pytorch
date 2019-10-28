@@ -8,7 +8,8 @@ from .fcn import _FCNHead
 
 __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deeplabv3_resnet101_voc',
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
-           'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet101_mapillary']
+           'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet101_mapillary',
+           'get_deeplabv3_resnet152_mapillary']
 
 INTERPOLATE_MODE = 'bilinear' # linear | bilinear | bicubic | trilinear # can't use linear
 
@@ -169,6 +170,10 @@ def get_deeplabv3_resnet101_citys(**kwargs):
 
 def get_deeplabv3_resnet101_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet101', **kwargs)
+
+
+def get_deeplabv3_resnet152_mapillary(**kwargs):
+    return get_deeplabv3('mapillary', 'resnet152', **kwargs)
 
 
 def get_deeplabv3_resnet152_voc(**kwargs):
