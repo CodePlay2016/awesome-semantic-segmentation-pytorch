@@ -265,7 +265,8 @@ mapillarypallete_full = [[165, 42, 42],
                      [0, 0, 70],
                      [0, 0, 192],
                      [32, 32, 32],
-                     [120, 10, 10]]
+                     [120, 10, 10],
+                     [0, 0, 0]]
 
 mapillarypallete_full = list(np.array(mapillarypallete_full).reshape((-1,)))
 
@@ -287,6 +288,34 @@ pallete_map = {
     "cityscapes": cityspallete,
     "mapillary_full": mapillarypallete_full
 }
+import matplotlib.pyplot as plt
+def draw_color_map(pallete, names=[]):
+    num_color = int(len(pallete) / 3)
+    width = 32
+    shape = (num_color*width, width, 3)
+    out_r = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+    out_g = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+    out_b = np.zeros((shape[0], shape[1]), dtype=np.uint8)
+    for i in range(-1, num_color):
+        out_r[i*width:i*width+width-1, :] = pallete[3 * i]
+        out_g[i*width:i*width+width-1, :] = pallete[3 * i + 1]
+        out_b[i*width:i*width+width-1, :] = pallete[3 * i + 2]
+    img = np.stack([out_r, out_g, out_b], axis=-1)
+    print(img.shape)
+    img = Image.fromarray(img)
+    d = ImageDraw.Draw(img)
+
+    pallete_np = np.array([[pallete[3*i], pallete[3*i+1], pallete[3*i+2]] for i in range(num_color)],dtype=np.uint8)
+    plt.figure()
+    plt.imshow(pallete_np.reshape((-1,1,3)), interpolation='nearest')
+    plt.yticks(range(len(names)), names, fontsize=10)
+    plt.xticks([], [])
+    plt.tick_params(width=0.0)
+    plt.show()
+
+    d.text((180, 0), "aaaa", full=(255,255,255))
+    return img
+
 
 if __name__ == "__main__":
     names = []
@@ -297,41 +326,11 @@ if __name__ == "__main__":
             name = line.split('[')[1].split(']')[0]
             names.append(name)
     print(names)
-    import cv2
-    import matplotlib.pyplot as plt
-    def draw_color_map(pallete):
-        num_color = int(len(pallete) / 3)
-        width = 32
-        shape = (num_color*width, width, 3)
-        out_r = np.zeros((shape[0], shape[1]), dtype=np.uint8)
-        out_g = np.zeros((shape[0], shape[1]), dtype=np.uint8)
-        out_b = np.zeros((shape[0], shape[1]), dtype=np.uint8)
-        for i in range(-1, num_color):
-            out_r[i*width:i*width+width-1, :] = pallete[3 * i]
-            out_g[i*width:i*width+width-1, :] = pallete[3 * i + 1]
-            out_b[i*width:i*width+width-1, :] = pallete[3 * i + 2]
-        img = np.stack([out_r, out_g, out_b], axis=-1)
-        print(img.shape)
-        img = Image.fromarray(img)
-        d = ImageDraw.Draw(img)
 
-        pallete_np = np.array([[pallete[3*i], pallete[3*i+1], pallete[3*i+2]] for i in range(num_color)],dtype=np.uint8)
-        plt.figure()
-        plt.imshow(pallete_np.reshape((-1,1,3)), interpolation='nearest')
-        # plt.imshow(np.array(img).astype(np.uint8), interpolation='nearest')
-        plt.yticks(range(len(names)), names, fontsize=10)
-        plt.xticks([], [])
-        plt.tick_params(width=0.0)
-        plt.show()
-        # for i in range(0, num_color):
-        #     coord = (int(i*width+1/2*width), 16)
-        #     d.text(coord, str(i), fill=(255,255,255))
-        #     print(coord)
-
-        d.text((180, 0), "aaaa", full=(255,255,255))
-        return img
-    img = draw_color_map(vocpallete66)
+    img = draw_color_map(mapillarypallete_full, names)
     img.save("/Users/hufangquan/color_map.png")
 
     npimg = np.load('/Users/hufangquan/self/AIWAYS/自己的周报/20191102/test_changyang_deeplabv3_resnet152_mapillary_raw.npy')
+    mask2 = get_color_pallete_c(npimg, "mapillary_full", 'mapillary')
+
     print('finish')
