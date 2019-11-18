@@ -1,2 +1,11 @@
-CUDA_VISIBLE_DEVICES=2 nohup python train.py --model deeplabv3 --backbone resnet152 --batch-size 8 --dataset mapillary --lr 0.0001 --epochs 50 --workers 0 --save-dir ../model/mapillary > output_mapi_full.log
+CUDA_VISIBLE_DEVICES=1 \
+nohup python train.py \
+    --model deeplabv3 \
+    --backbone resnet50 \
+    --batch-size 16 \
+    --dataset mapillary \
+    --lr 0.01 \
+    --epochs 200 \
+    --workers 0 \
+    --save-dir ../model/mapillary_selected/ > output_mapi_selected.log &
 #CUDA_VISIBLE_DEVICES=5 python train.py --model deeplabv3 --backbone resnet101 --dataset mapillary --lr 0.0001 --epochs 50 --workers 0 --save-dir ../model

@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from PIL import Image, ImageDraw
-from ..data.dataloader import datasets
+from ..data.dataloader import datasets, mapillary
 
 __all__ = ['get_color_pallete', 'print_iou', 'set_img_color',
            'show_prediction', 'show_colorful_images', 'save_colorful_images']
@@ -201,7 +201,7 @@ cityspallete = [
     119, 11, 32,
 ]
 
-mapillarypallete_full = [[165, 42, 42],
+mapillarypallete_full = np.array([[165, 42, 42],
                      [0, 192, 0],
                      [196, 196, 196],
                      [190, 153, 153],
@@ -266,21 +266,17 @@ mapillarypallete_full = [[165, 42, 42],
                      [0, 0, 192],
                      [32, 32, 32],
                      [120, 10, 10],
-                     [0, 0, 0]]
+                     [0, 0, 0]])
 
-mapillarypallete_full = list(np.array(mapillarypallete_full).reshape((-1,)))
+_, mapi_selected_index = np.unique(np.array(mapillary.MapillarySegmentation.KEY), return_index=True)
+mapillarypallete_selected = mapillarypallete_full[mapi_selected_index]
 
-mapillarypallete = [0, 0, 0,
-                    220, 220, 0,
-                    0, 255, 255,
-                    0, 0, 255,
-                    255, 0, 0,
-                    255, 0, 255,
-                    0, 0, 0,
-                    0, 0, 0,
-                    0, 255, 0,
-                    0, 0, 0,
-                    0, 0, 0]
+mapillarypallete_full = list(mapillarypallete_full.reshape((-1,)))
+
+import pdb
+pdb.set_trace()
+mapillarypallete = list(mapillarypallete_selected.reshape((-1,)))
+
 
 pallete_map = {
     "voc66": vocpallete66,

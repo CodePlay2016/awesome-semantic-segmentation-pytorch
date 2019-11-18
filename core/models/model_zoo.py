@@ -40,6 +40,7 @@ _models = {
     'deeplabv3_resnet50_ade': get_deeplabv3_resnet50_ade,
     'deeplabv3_resnet101_ade': get_deeplabv3_resnet101_ade,
     'deeplabv3_resnet101_citys': get_deeplabv3_resnet101_citys,
+    'deeplabv3_resnet50_mapillary': get_deeplabv3_resnet50_mapillary,
     'deeplabv3_resnet101_mapillary': get_deeplabv3_resnet101_mapillary,
     'deeplabv3_resnet152_mapillary': get_deeplabv3_resnet152_mapillary,
     'deeplabv3_resnet152_ade': get_deeplabv3_resnet152_ade,

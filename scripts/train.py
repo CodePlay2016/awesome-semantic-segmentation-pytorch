@@ -219,7 +219,10 @@ class Trainer(object):
             targets = targets.to(self.device)
 
             outputs = self.model(images)
-            loss_dict = self.criterion(outputs, targets)
+            # loss_dict = self.criterion(outputs, targets, num_class=6)
+            class_weights = [0.5, 3, 1, 1, 1]
+            class_weights = torch.FloatTensor(class_weights).cuda()
+            loss_dict = self.criterion(outputs, targets, weight=class_weights)
 
             losses = sum(loss for loss in loss_dict.values())
 

@@ -6,13 +6,20 @@ import numpy as np
 from PIL import Image
 from .segbase import SegmentationDataset
 
-KEY = [-1, -1, 1, 2, 2, 2, -1, 0, 0, 1,
-          0, 6, 0, 0, 0, 6, -1, -1, -1, 5,
-          7, 7, 7, 0, 0, -1, -1, -1, -1, 6,
-          -1,-1, -1, -1, 8, -1, 0, -1, 8, -1,
-          -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
-          -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
-          4, 4, 4, -1, -1, 9]
+# KEY = [-1, -1, 1, 2, 2, 2, -1, 0, 0, 1,
+#           0, 6, 0, 0, 0, 6, -1, -1, -1, 5,
+#           7, 7, 7, 0, 0, -1, -1, -1, -1, 6,
+#           -1,-1, -1, -1, 8, -1, 0, -1, 8, -1,
+#           -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
+#           -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
+#           4, 4, 4, -1, -1, 9]
+KEY = [-1, -1, 1, -1, -1, -1, -1, 0, 0, 1, # ONLY contain road, curb, human, obstacles and vehicles
+        0, 0, 0, 0, 0, 0, -1, -1, -1, 2, 2,
+        2, 2, 0, 0, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, 0, -1, 3, -1, -1,
+        0, -1, 0, -1, 3, -1, 3, -1, -1, -1, 3,
+        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1, -1]
+NUM_CLASS = 5
 class MapillarySegmentation(SegmentationDataset):
     """Mapillary Vista Semantic Segmentation Dataset.
 
@@ -39,11 +46,11 @@ class MapillarySegmentation(SegmentationDataset):
     >>>     num_workers=4)
     """
     BASE_DIR = 'mapillary'
-    USE_FULL_LABEL = True
-    NUM_CLASS = 66 if USE_FULL_LABEL else 10
+    USE_FULL_LABEL = False
+    NUM_CLASS = 66 if USE_FULL_LABEL else NUM_CLASS
     VALID_CLASS = list(range(NUM_CLASS))
     KEY = KEY
-    LABEL_MAP = {i:KEY[i] for i in range(66)}
+    LABEL_MAP = {i:KEY[i] for i in range(-1, 65)}
 
     def __init__(self, root='../datasets/mapillary', split='train', mode=None, transform=None, **kwargs):
         super(MapillarySegmentation, self).__init__(root, split, mode, transform, **kwargs)
@@ -54,11 +61,12 @@ class MapillarySegmentation(SegmentationDataset):
         if len(self.images) == 0:
             raise RuntimeError("Found 0 images in subfolders of:" + root + "\n")
         if not self.USE_FULL_LABEL:
-            self.valid_classes = [ 2,  3,  4,  5,  7,  8,  9, 10, 11, 12, 13, 14, 15, 19, 20, 21, 22,
-                                  23, 24, 29, 34, 36, 38, 41, 42, 43, 45, 47, 51, 52, 53, 54, 55, 56,
-                                  57, 58, 59, 60, 61, 62]
+            self.valid_classes = []
+            for ii in range(-1, len(self.KEY)-1):
+                if not self.KEY[ii] == -1:
+                    self.valid_classes.append(ii)
             self._key = np.array(self.KEY)
-            self._mapping = np.array(range(0, len(self._key))).astype('int32')
+            self._mapping = np.array(list(range(0, len(self._key)))).astype('int32')
         else:
             self.valid_classes = list(range(0, self.NUM_CLASS))
             self._key = np.arange(0, self.NUM_CLASS)
@@ -66,7 +74,6 @@ class MapillarySegmentation(SegmentationDataset):
 
     def _class_to_index(self, mask):
         # assert the value
-        # print("mapping: ", self._mapping)
         values = np.unique(mask)
         for value in values:
             assert (value in self._mapping)
