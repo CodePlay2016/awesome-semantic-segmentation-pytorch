@@ -5,6 +5,7 @@ import glob
 import argparse
 import time
 import torch
+import cv2
 
 cur_path = os.path.abspath(os.path.dirname(__file__))
 root_path = os.path.split(cur_path)[0]
@@ -40,6 +41,56 @@ parser.add_argument('--repetition', type=int, default=1)
 args = parser.parse_args()
 
 REP = args.repetition
+
+def demo_vedio(config):
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cpu')
+    print('using device %s' % device)
+    # output folder
+    # load vedio
+    read_video_path = "../tests/test_cyl_front.avi"
+    video_cap = cv2.VideoCapture(read_video_path)
+    write_video_path = '../result/demo.avi'
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+    size = config.input_size.split(',')
+    size = [int(a.strip()) for a in size]
+    video_writer = cv2.VideoWriter(write_video_path, fourcc, 30,
+                                    (size[1], size[0]))
+    
+    
+    # load model
+    model = get_model(config.model, pretrained=True, root=config.save_folder, local_rank=config.local_rank).to(device)
+    print('Finished loading model!')
+    model.eval()
+    # image transform
+    transform = transform = transforms.Compose([
+        transforms.Resize(size),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    ])
+
+    for i in range(3): ret, frame = video_cap.read()
+    frame_index = 0
+    while True:
+        ret, frame = video_cap.read()
+        if not ret: break
+        t0 = time.time()
+        image = Image.fromarray(frame).convert("RGB")
+        images = transform(image).unsqueeze(0).to(device)
+        with torch.no_grad():
+            output = model(images)
+            pred = torch.argmax(output[0], 1).squeeze(0).cpu().data.numpy()
+            mask1 = get_color_pallete_c(pred, "mapillary", config.dataset)
+        sys.stdout.write("\r%d/%d, time use: %.2fms" % (frame_index, 1107, (time.time()-t0)*1000))
+        sys.stdout.flush()
+        video_writer.write(np.array(mask1, dtype=np.uint8))
+        frame_index += 1
+        import pdb
+        pdb.set_trace()
+    video_writer.release()
+    print("finish")
+
 
 def demo(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -126,4 +177,5 @@ def demo(config):
     # print('time used for %d repetition is %.2f seconds, %.2f seconds for each rep'%(REP, elapse, elapse/REP))
 
 if __name__ == '__main__':
-    demo(args)
+    # demo(args)
+    demo_vedio(args)

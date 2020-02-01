@@ -13,13 +13,12 @@ from .segbase import SegmentationDataset
 #           -1, 0, 8, 0, -1, 8, -1, 8, -1, -1,
 #           -1, 8, 3, 4, 4, 4, 4, 3, 4, 4,
 #           4, 4, 4, -1, -1, 9]
-KEY = [-1, -1, 1, -1, -1, -1, -1, 0, 0, 1, # ONLY contain road, curb, human, obstacles and vehicles
-        0, 0, 0, 0, 0, 0, -1, -1, -1, 2, 2,
-        2, 2, 0, 0, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, 0, -1, 3, -1, -1,
-        0, -1, 0, -1, 3, -1, 3, -1, -1, -1, 3,
-        4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1, -1]
-NUM_CLASS = 5
+KEY = [-1, -1, 1, -1, 5, 5, 5, 0, 0, 1, 0, 0, 0, # ONLY contain road, curb, human, obstacles, vehicles, other, terrain and unlabeld
+       0, 0, 0, 5, 5, 5, 2, 2, 2, 2, 0, 0, 4, 5,
+       5, 5, 6, 5, 5, 5, 3, 3, -1, 0, -1, 3, -1,
+       -1, 3, -1, 3, 5, 3, 3, 3, 5, 3, 3, 3, 4,
+       4, 4, 4, 4, 4, 4, 4, 4, 4, 4, -1, -1, -1]
+NUM_CLASS = 7
 class MapillarySegmentation(SegmentationDataset):
     """Mapillary Vista Semantic Segmentation Dataset.
 

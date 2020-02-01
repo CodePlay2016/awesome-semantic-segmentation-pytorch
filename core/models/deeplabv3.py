@@ -6,12 +6,15 @@ import torch.nn.functional as F
 from .segbase import SegBaseModel
 from .fcn import _FCNHead
 
+import time
+
 __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deeplabv3_resnet101_voc',
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
            'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet50_mapillary',
-           'get_deeplabv3_resnet101_mapillary', 'get_deeplabv3_resnet152_mapillary']
+           'get_deeplabv3_resnet101_mapillary', 'get_deeplabv3_resnet152_mapillary', 'get_deeplabv3_resnet18_mapillary']
 
 INTERPOLATE_MODE = 'bilinear' # linear | bilinear | bicubic | trilinear # can't use linear
+ALIGN_CORNER = False
 
 class DeepLabV3(SegBaseModel):
     r"""DeepLabV3
@@ -43,23 +46,36 @@ class DeepLabV3(SegBaseModel):
         self.__setattr__('exclusive', ['head', 'auxlayer'] if aux else ['head'])
 
     def forward(self, x):
+        t0 = time.time()
         size = x.size()[2:]
+        t1 = time.time()
         _, _, c3, c4 = self.base_forward(x)
+        print("base forward cost: %.2fms" % ((time.time() - t1)*1000))
         outputs = []
+        t1 = time.time()
         x = self.head(c4)
-        x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=True)
+        print("head cost: %.2fms" % ((time.time() - t1)*1000))
+        x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
         outputs.append(x)
 
         if self.aux:
             auxout = self.auxlayer(c3)
-            auxout = F.interpolate(auxout, size, mode=INTERPOLATE_MODE, align_corners=True)
+            auxout = F.interpolate(auxout, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
             outputs.append(auxout)
+        print("total forward cost: %.2fms" % ((time.time() - t1)*1000))
         return tuple(outputs)
 
 
 class _DeepLabHead(nn.Module):
-    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, norm_kwargs=None, **kwargs):
+    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, pre_conv=False, norm_kwargs=None, **kwargs):
         super(_DeepLabHead, self).__init__()
+        self.do_preconv = pre_conv
+        if pre_conv:
+            self.pre_conv = nn.Sequential(
+                nn.Conv2d(512, 2048, 3, padding=1, bias=False),
+                norm_layer(2048, **({} if norm_kwargs is None else norm_kwargs)),
+                nn.ReLU(True),
+            )
         self.aspp = _ASPP(2048, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
         self.block = nn.Sequential(
             nn.Conv2d(256, 256, 3, padding=1, bias=False),
@@ -70,7 +86,11 @@ class _DeepLabHead(nn.Module):
         )
 
     def forward(self, x):
+        if self.do_preconv:
+            x = self.pre_conv(x)
+        t1 = time.time()
         x = self.aspp(x)
+        print("ASPP cost: %.2f ms" % ((time.time() - t1)*1000))
         return self.block(x)
 
 
@@ -100,7 +120,7 @@ class _AsppPooling(nn.Module):
     def forward(self, x):
         size = x.size()[2:]
         pool = self.gap(x)
-        out = F.interpolate(pool, size, mode='bilinear', align_corners=True)
+        out = F.interpolate(pool, size, mode='bilinear', align_corners=ALIGN_CORNER)
         return out
 
 
@@ -161,12 +181,14 @@ def get_deeplabv3(dataset='pascal_voc', backbone='resnet50', pretrained=False, r
 def get_deeplabv3_resnet50_voc(**kwargs):
     return get_deeplabv3('pascal_voc', 'resnet50', **kwargs)
 
-
 def get_deeplabv3_resnet101_voc(**kwargs):
     return get_deeplabv3('pascal_voc', 'resnet101', **kwargs)
 
 def get_deeplabv3_resnet101_citys(**kwargs):
     return get_deeplabv3('citys', 'resnet101', **kwargs)
+
+def get_deeplabv3_resnet18_mapillary(**kwargs):
+    return get_deeplabv3('mapillary', 'resnet18', do_preconv=True, **kwargs)
 
 def get_deeplabv3_resnet50_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet50', **kwargs)

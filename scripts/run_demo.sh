@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=0 python demo.py \
     --save-folder ../model/mapillary_selected \
     --dataset mapillary \
     --demo-dir "/home/hufq/data/correct_cylinder/*.png" \
-    --input-size '720,1280' \
+    --input-size '320,640' \
     --input-pic /home/hufq/test_changyang.png \
     --out-dir /home/hufq/data/cylinder/out_720_selected \
     --repetition 1

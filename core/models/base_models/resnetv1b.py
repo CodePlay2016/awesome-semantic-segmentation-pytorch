@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 
 __all__ = ['ResNetV1b', 'resnet18_v1b', 'resnet34_v1b', 'resnet50_v1b',
-           'resnet101_v1b', 'resnet152_v1b', 'resnet152_v1s', 'resnet101_v1s', 'resnet50_v1s']
+           'resnet101_v1b', 'resnet152_v1b', 'resnet152_v1s', 'resnet101_v1s', 'resnet50_v1s', 'resnet18_v1s']
 
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
@@ -91,35 +91,35 @@ class BottleneckV1b(nn.Module):
 
 class ResNetV1b(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, dilated=True, deep_stem=False,
+    def __init__(self, block, layers, base_channel, num_classes=1000, dilated=True, deep_stem=False,
                  zero_init_residual=False, norm_layer=nn.BatchNorm2d, **kwargs):
-        self.inplanes = 128 if deep_stem else 64
+        self.inplanes = base_channel*2 if deep_stem else base_channel
         super(ResNetV1b, self).__init__()
         if deep_stem:
             self.conv1 = nn.Sequential(
-                nn.Conv2d(3, 64, 3, 2, 1, bias=False),
-                norm_layer(64),
+                nn.Conv2d(3, base_channel, 3, 2, 1, bias=False),
+                norm_layer(base_channel),
                 nn.ReLU(True),
-                nn.Conv2d(64, 64, 3, 1, 1, bias=False),
-                norm_layer(64),
+                nn.Conv2d(base_channel, base_channel, 3, 1, 1, bias=False),
+                norm_layer(base_channel),
                 nn.ReLU(True),
-                nn.Conv2d(64, 128, 3, 1, 1, bias=False)
+                nn.Conv2d(base_channel, base_channel*2, 3, 1, 1, bias=False)
             )
         else:
-            self.conv1 = nn.Conv2d(3, 64, 7, 2, 3, bias=False)
+            self.conv1 = nn.Conv2d(3, base_channel, 7, 2, 3, bias=False)
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(True)
         self.maxpool = nn.MaxPool2d(3, 2, 1)
-        self.layer1 = self._make_layer(block, 64, layers[0], norm_layer=norm_layer)
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2, norm_layer=norm_layer)
+        self.layer1 = self._make_layer(block, base_channel, layers[0], norm_layer=norm_layer)
+        self.layer2 = self._make_layer(block, base_channel*2, layers[1], stride=2, norm_layer=norm_layer)
         if dilated:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=1, dilation=2, norm_layer=norm_layer)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=1, dilation=4, norm_layer=norm_layer)
+            self.layer3 = self._make_layer(block, base_channel*4, layers[2], stride=1, dilation=2, norm_layer=norm_layer)
+            self.layer4 = self._make_layer(block, base_channel*8, layers[3], stride=1, dilation=4, norm_layer=norm_layer)
         else:
-            self.layer3 = self._make_layer(block, 256, layers[2], stride=2, norm_layer=norm_layer)
-            self.layer4 = self._make_layer(block, 512, layers[3], stride=2, norm_layer=norm_layer)
+            self.layer3 = self._make_layer(block, base_channel*4, layers[2], stride=2, norm_layer=norm_layer)
+            self.layer4 = self._make_layer(block, base_channel*8, layers[3], stride=2, norm_layer=norm_layer)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(base_channel*8 * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -178,7 +178,7 @@ class ResNetV1b(nn.Module):
 
 
 def resnet18_v1b(pretrained=False, **kwargs):
-    model = ResNetV1b(BasicBlockV1b, [2, 2, 2, 2], **kwargs)
+    model = ResNetV1b(BasicBlockV1b, [2, 2, 2, 2], 64, **kwargs)
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet18'])
         model_dict = model.state_dict()
@@ -189,7 +189,7 @@ def resnet18_v1b(pretrained=False, **kwargs):
 
 
 def resnet34_v1b(pretrained=False, **kwargs):
-    model = ResNetV1b(BasicBlockV1b, [3, 4, 6, 3], **kwargs)
+    model = ResNetV1b(BasicBlockV1b, [3, 4, 6, 3], 64, **kwargs)
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet34'])
         model_dict = model.state_dict()
@@ -200,7 +200,7 @@ def resnet34_v1b(pretrained=False, **kwargs):
 
 
 def resnet50_v1b(pretrained=False, **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 4, 6, 3], **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 4, 6, 3], 64, **kwargs)
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet50'])
         model_dict = model.state_dict()
@@ -211,7 +211,7 @@ def resnet50_v1b(pretrained=False, **kwargs):
 
 
 def resnet101_v1b(pretrained=False, **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 4, 23, 3], **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 4, 23, 3], 64, **kwargs)
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet101'])
         model_dict = model.state_dict()
@@ -222,7 +222,7 @@ def resnet101_v1b(pretrained=False, **kwargs):
 
 
 def resnet152_v1b(pretrained=False, **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 8, 36, 3], **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 8, 36, 3], 64, **kwargs)
     if pretrained:
         old_dict = model_zoo.load_url(model_urls['resnet152'])
         model_dict = model.state_dict()
@@ -232,16 +232,23 @@ def resnet152_v1b(pretrained=False, **kwargs):
     return model
 
 
+def resnet18_v1s(pretrained=False, root='~/.torch/models', **kwargs):
+    # model = ResNetV1b(BottleneckV1b, [2, 2, 2, 2], 64, deep_stem=True, **kwargs)
+    model = ResNetV1b(BasicBlockV1b, [2, 2, 2, 2], 64, deep_stem=False, **kwargs)
+    if pretrained:
+        from ..model_store import get_resnet_file
+        model.load_state_dict(torch.load(get_resnet_file('resnet18', root=root)), strict=False)
+    return model
+
 def resnet50_v1s(pretrained=False, root='~/.torch/models', **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 4, 6, 3], deep_stem=True, **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 4, 6, 3], 64, deep_stem=True, **kwargs)
     if pretrained:
         from ..model_store import get_resnet_file
         model.load_state_dict(torch.load(get_resnet_file('resnet50', root=root)), strict=False)
     return model
 
-
 def resnet101_v1s(pretrained=False, root='~/.torch/models', **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 4, 23, 3], deep_stem=True, **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 4, 23, 3], 64, deep_stem=True, **kwargs)
     if pretrained:
         from ..model_store import get_resnet_file
         model.load_state_dict(torch.load(get_resnet_file('resnet101', root=root)), strict=False)
@@ -249,7 +256,7 @@ def resnet101_v1s(pretrained=False, root='~/.torch/models', **kwargs):
 
 
 def resnet152_v1s(pretrained=False, root='~/.torch/models', **kwargs):
-    model = ResNetV1b(BottleneckV1b, [3, 8, 36, 3], deep_stem=True, **kwargs)
+    model = ResNetV1b(BottleneckV1b, [3, 8, 36, 3], 64, deep_stem=True, **kwargs)
     if pretrained:
         from ..model_store import get_resnet_file
         model.load_state_dict(torch.load(get_resnet_file('resnet152', root=root)), strict=False)

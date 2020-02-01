@@ -2,7 +2,7 @@
 import torch.nn as nn
 
 from ..nn import JPU
-from .base_models.resnetv1b import resnet50_v1s, resnet101_v1s, resnet152_v1s
+from .base_models.resnetv1b import resnet18_v1s, resnet18_v1b, resnet50_v1s, resnet101_v1s, resnet152_v1s
 
 __all__ = ['SegBaseModel']
 
@@ -24,6 +24,8 @@ class SegBaseModel(nn.Module):
         self.nclass = nclass
         if backbone == 'resnet50':
             self.pretrained = resnet50_v1s(pretrained=pretrained_base, dilated=dilated, **kwargs)
+        elif backbone == 'resnet18':
+            self.pretrained = resnet18_v1s(pretrained=True, dilated=dilated, **kwargs)
         elif backbone == 'resnet101':
             self.pretrained = resnet101_v1s(pretrained=pretrained_base, dilated=dilated, **kwargs)
         elif backbone == 'resnet152':

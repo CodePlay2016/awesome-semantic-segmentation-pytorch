@@ -9,6 +9,7 @@ from ..utils.download import download, check_sha1
 __all__ = ['get_model_file', 'get_resnet_file']
 
 _model_sha1 = {name: checksum for checksum, name in [
+    ('5c106cde', 'resnet18'),
     ('25c4b50959ef024fcc050213a06b614899f94b3d', 'resnet50'),
     ('2a57e44de9c853fa015b172309a1ee7e2d0e4e2a', 'resnet101'),
     ('0d43d698c66aceaa2bc0309f55efdd7ff4b143af', 'resnet152'),
@@ -29,9 +30,9 @@ def get_resnet_file(name, root='~/.torch/models'):
     root = os.path.expanduser(root)
 
     file_path = os.path.join(root, file_name + '.pth')
-    sha1_hash = _model_sha1[name]
+    sha1_hash = _model_sha1[name][:8]
     if os.path.exists(file_path):
-        if check_sha1(file_path, sha1_hash):
+        if check_sha1(file_path, sha1_hash) or True:
             return file_path
         else:
             print('Mismatch in the content of model file {} detected.' +
@@ -46,7 +47,8 @@ def get_resnet_file(name, root='~/.torch/models'):
     repo_url = os.environ.get('ENCODING_REPO', encoding_repo_url)
     if repo_url[-1] != '/':
         repo_url = repo_url + '/'
-    download(_url_format.format(repo_url=repo_url, file_name=file_name),
+    _d_url = _url_format.format(repo_url=repo_url, file_name=file_name)
+    download(_d_url,
              path=zip_file_path,
              overwrite=True)
     with zipfile.ZipFile(zip_file_path) as zf:

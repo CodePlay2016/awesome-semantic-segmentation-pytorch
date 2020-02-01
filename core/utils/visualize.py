@@ -94,7 +94,7 @@ def putpalette(npimg, pallete_name, dataset='pascal_voc'):
     num_class = datasets[dataset].NUM_CLASS
     count = dict({})
     for i in range(num_class):
-        if dataset == "mapillary" and pallete_name == "mapillary":
+        if dataset == "mapillary" and pallete_name == "mapillary_full":
             k = datasets[dataset].KEY[i]
         else:
             k = i
@@ -273,8 +273,7 @@ mapillarypallete_selected = mapillarypallete_full[mapi_selected_index]
 
 mapillarypallete_full = list(mapillarypallete_full.reshape((-1,)))
 
-import pdb
-pdb.set_trace()
+mapillarypallete_selected[1] = np.array([255, 255, 0])
 mapillarypallete = list(mapillarypallete_selected.reshape((-1,)))
 
 
