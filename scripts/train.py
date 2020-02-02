@@ -82,7 +82,7 @@ def parse_args():
                         help='disables CUDA training')
     parser.add_argument('--multi-cuda', action='store_true', default=False,
                         help='whether to use multiple CUDA for training')
-    parser.add_argument('--gpu-ids', type=str, default='0,1,2,3',
+    parser.add_argument('--gpu-ids', type=str, default='',
                         help='use which gpu to train, must be a \
                         comma-separated list of integers only (default=0)')
     parser.add_argument('--local_rank', type=int, default=0)
@@ -166,8 +166,9 @@ class Trainer(object):
 
         # create network
         BatchNorm2d = nn.SyncBatchNorm if args.distributed else nn.BatchNorm2d
+        preconv = True if args.backbone in ["resnet18"] else False
         self.model = get_segmentation_model(model=args.model, dataset=args.dataset, backbone=args.backbone,
-                                            aux=args.aux, jpu=args.jpu, norm_layer=BatchNorm2d, pre_conv=True).to(self.device)
+                                            aux=args.aux, jpu=args.jpu, norm_layer=BatchNorm2d, pre_conv=preconv).to(self.device)
         
         # resume checkpoint if needed
         if args.resume:
@@ -178,8 +179,11 @@ class Trainer(object):
                 self.model.load_state_dict(torch.load(args.resume, map_location=lambda storage, loc: storage))
 
         # create criterion
+        class_weights = [1, 1, 1, 1, 1, 1, 1]# road, curb, human, obstacles, vehicles, other, terrain and unlabeld
+        # class_weights = [0.1, 20, 5, 20, 5, 5, 1]# road, curb, human, obstacles, vehicles, other, terrain and unlabeld
+        class_weights = torch.FloatTensor(class_weights).to(self.device)
         self.criterion = get_segmentation_loss(args.model, use_ohem=args.use_ohem, aux=args.aux,
-                                               aux_weight=args.aux_weight, ignore_index=-1).to(self.device)
+                                               aux_weight=args.aux_weight, ignore_index=-1, weight=class_weights).to(self.device)
 
         # optimizer, for model just includes pretrained, head and auxlayer
         params_list = list()
@@ -230,9 +234,7 @@ class Trainer(object):
 
             outputs = self.model(images)
             # loss_dict = self.criterion(outputs, targets, num_class=6)
-            class_weights = [0.5, 3, 1, 1, 1, 1, 1]
-            class_weights = torch.FloatTensor(class_weights).cuda()
-            loss_dict = self.criterion(outputs, targets, weight=class_weights)
+            loss_dict = self.criterion(outputs, targets)
 
             losses = sum(loss for loss in loss_dict.values())
 
@@ -318,7 +320,8 @@ if __name__ == '__main__':
 
     # reference maskrcnn-benchmark
     num_gpus = int(os.environ["WORLD_SIZE"]) if "WORLD_SIZE" in os.environ else 1
-    num_gpus = len(args.gpu_ids)
+    num_gpus = len(args.gpu_ids.split(','))
+    
     args.num_gpus = num_gpus
     # args.distributed = num_gpus > 1
     args.distributed = False

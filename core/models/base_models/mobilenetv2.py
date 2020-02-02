@@ -8,7 +8,6 @@ __all__ = ['MobileNet', 'MobileNetV2', 'get_mobilenet', 'get_mobilenet_v2',
            'mobilenet1_0', 'mobilenet_v2_1_0', 'mobilenet0_75', 'mobilenet_v2_0_75',
            'mobilenet0_5', 'mobilenet_v2_0_5', 'mobilenet0_25', 'mobilenet_v2_0_25']
 
-
 class MobileNet(nn.Module):
     def __init__(self, num_classes=1000, multiplier=1.0, norm_layer=nn.BatchNorm2d, **kwargs):
         super(MobileNet, self).__init__()
@@ -118,7 +117,9 @@ def get_mobilenet_v2(multiplier=1.0, pretrained=False, root='~/.torch/models', *
     model = MobileNetV2(multiplier=multiplier, **kwargs)
 
     if pretrained:
-        raise ValueError("Not support pretrained")
+        # raise ValueError("Not support pretrained")
+        state_dict = torch.load(get_resnet_file('mobilenet_v2', root=root))
+        model.load_state_dict(state_dict)
     return model
 
 

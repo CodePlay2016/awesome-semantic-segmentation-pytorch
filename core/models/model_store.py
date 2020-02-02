@@ -15,6 +15,10 @@ _model_sha1 = {name: checksum for checksum, name in [
     ('0d43d698c66aceaa2bc0309f55efdd7ff4b143af', 'resnet152'),
 ]}
 
+mobilenet_model_urls = {
+    'mobilenet_v2': 'https://download.pytorch.org/models/mobilenet_v2-b0353104.pth',
+}
+
 encoding_repo_url = 'https://hangzh.s3.amazonaws.com/'
 _url_format = '{repo_url}encoding/models/{file_name}.zip'
 
@@ -59,6 +63,24 @@ def get_resnet_file(name, root='~/.torch/models'):
         return file_path
     else:
         raise ValueError('Downloaded file has different hash. Please try again.')
+
+def get_mobilenet_file(name, root='~/.torch/models'):
+    file_name = '{name}-{short_hash}'.format(name=name, short_hash=short_hash(name))
+    root = os.path.expanduser(root)
+    file_path = os.path.join(root, file_name + '.pth')
+    if os.path.exists(file_path):
+        return file_path
+    else:
+        print('Model file {} is not found. Downloading.'.format(file_path))
+    
+    if not os.path.exists(root):
+        os.makedirs(root)
+    
+    assert name in ['mobilenet_v2'], 'mobilenet model name incorrect'
+    download(mobilenet_model_urls[name],
+             path=file_path,
+             overwrite=True)
+    return file_path
 
 
 def get_model_file(name, root='~/.torch/models'):

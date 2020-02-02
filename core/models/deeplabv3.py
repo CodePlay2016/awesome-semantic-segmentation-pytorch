@@ -14,7 +14,7 @@ __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deep
            'get_deeplabv3_resnet101_mapillary', 'get_deeplabv3_resnet152_mapillary', 'get_deeplabv3_resnet18_mapillary']
 
 INTERPOLATE_MODE = 'bilinear' # linear | bilinear | bicubic | trilinear # can't use linear
-ALIGN_CORNER = False
+ALIGN_CORNER = True
 
 class DeepLabV3(SegBaseModel):
     r"""DeepLabV3
@@ -50,11 +50,11 @@ class DeepLabV3(SegBaseModel):
         size = x.size()[2:]
         t1 = time.time()
         _, _, c3, c4 = self.base_forward(x)
-        print("base forward cost: %.2fms" % ((time.time() - t1)*1000))
+        # print("base forward cost: %.2fms" % ((time.time() - t1)*1000))
         outputs = []
         t1 = time.time()
         x = self.head(c4)
-        print("head cost: %.2fms" % ((time.time() - t1)*1000))
+        # print("head cost: %.2fms" % ((time.time() - t1)*1000))
         x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
         outputs.append(x)
 
@@ -62,7 +62,7 @@ class DeepLabV3(SegBaseModel):
             auxout = self.auxlayer(c3)
             auxout = F.interpolate(auxout, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
             outputs.append(auxout)
-        print("total forward cost: %.2fms" % ((time.time() - t1)*1000))
+        # print("total forward cost: %.2fms" % ((time.time() - t1)*1000))
         return tuple(outputs)
 
 
@@ -90,7 +90,7 @@ class _DeepLabHead(nn.Module):
             x = self.pre_conv(x)
         t1 = time.time()
         x = self.aspp(x)
-        print("ASPP cost: %.2f ms" % ((time.time() - t1)*1000))
+        # print("ASPP cost: %.2f ms" % ((time.time() - t1)*1000))
         return self.block(x)
 
 
@@ -188,7 +188,7 @@ def get_deeplabv3_resnet101_citys(**kwargs):
     return get_deeplabv3('citys', 'resnet101', **kwargs)
 
 def get_deeplabv3_resnet18_mapillary(**kwargs):
-    return get_deeplabv3('mapillary', 'resnet18', do_preconv=True, **kwargs)
+    return get_deeplabv3('mapillary', 'resnet18', pre_conv=True, **kwargs)
 
 def get_deeplabv3_resnet50_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet50', **kwargs)
