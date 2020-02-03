@@ -36,7 +36,7 @@ def parse_args():
                                  'cgnet', 'espnet', 'lednet', 'dfanet'],
                         help='model name (default: fcn32s)')
     parser.add_argument('--backbone', type=str, default='resnet50',
-                        choices=['vgg16', 'resnet18', 'resnet50',
+                        choices=['vgg16', 'mobilenetv2', 'resnet18', 'resnet50',
                                  'resnet101', 'resnet152', 'densenet121',
                                  'densenet161', 'densenet169', 'densenet201'],
                         help='backbone name (default: vgg16)')
@@ -98,7 +98,7 @@ def parse_args():
     parser.add_argument('--log-iter', type=int, default=10,
                         help='print log every log-iter')
     # evaluation only
-    parser.add_argument('--val-epoch', type=int, default=1,
+    parser.add_argument('--val-epoch', type=float, default=1,
                         help='run validation every val-epoch')
     parser.add_argument('--skip-val', action='store_true', default=False,
                         help='skip validation during training')
@@ -166,7 +166,7 @@ class Trainer(object):
 
         # create network
         BatchNorm2d = nn.SyncBatchNorm if args.distributed else nn.BatchNorm2d
-        preconv = True if args.backbone in ["resnet18"] else False
+        preconv = True if args.backbone in ["resnet18", "mobilenetv2"] else False
         self.model = get_segmentation_model(model=args.model, dataset=args.dataset, backbone=args.backbone,
                                             aux=args.aux, jpu=args.jpu, norm_layer=BatchNorm2d, pre_conv=preconv).to(self.device)
         
@@ -220,7 +220,7 @@ class Trainer(object):
     def train(self):
         save_to_disk = get_rank() == 0
         epochs, max_iters = self.args.epochs, self.args.max_iters
-        log_per_iters, val_per_iters = self.args.log_iter, self.args.val_epoch * self.args.iters_per_epoch
+        log_per_iters, val_per_iters = self.args.log_iter, int(self.args.val_epoch * self.args.iters_per_epoch)
         save_per_iters = self.args.save_epoch * self.args.iters_per_epoch
         start_time = time.time()
         logger.info('Start training, Total Epochs: {:d} = Total Iterations {:d}'.format(epochs, max_iters))

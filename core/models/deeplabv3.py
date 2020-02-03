@@ -39,7 +39,12 @@ class DeepLabV3(SegBaseModel):
 
     def __init__(self, nclass, backbone='resnet50', aux=False, pretrained_base=True, **kwargs):
         super(DeepLabV3, self).__init__(nclass, aux, backbone, pretrained_base=pretrained_base, **kwargs)
-        self.head = _DeepLabHead(nclass, **kwargs)
+        self.backbone = backbone
+        if kwargs['pre_conv']:
+            pre_conv_channel = 512 if backbone == 'resnet18' else 1280
+        else:
+            pre_conv_channel = -1
+        self.head = _DeepLabHead(nclass, pre_conv_channel=pre_conv_channel, **kwargs)
         if self.aux:
             self.auxlayer = _FCNHead(1024, nclass, **kwargs)
 
@@ -49,16 +54,19 @@ class DeepLabV3(SegBaseModel):
         t0 = time.time()
         size = x.size()[2:]
         t1 = time.time()
-        _, _, c3, c4 = self.base_forward(x)
-        # print("base forward cost: %.2fms" % ((time.time() - t1)*1000))
         outputs = []
-        t1 = time.time()
+        if self.backbone == 'mobilenetv2':
+            c4 = self.base_forward(x)
+        else:
+            _, _, c3, c4 = self.base_forward(x)
+            # print("base forward cost: %.2fms" % ((time.time() - t1)*1000))
+            t1 = time.time()
         x = self.head(c4)
         # print("head cost: %.2fms" % ((time.time() - t1)*1000))
         x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
         outputs.append(x)
 
-        if self.aux:
+        if self.aux and not self.backbone == 'mobilenet_v2':
             auxout = self.auxlayer(c3)
             auxout = F.interpolate(auxout, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
             outputs.append(auxout)
@@ -67,16 +75,18 @@ class DeepLabV3(SegBaseModel):
 
 
 class _DeepLabHead(nn.Module):
-    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, pre_conv=False, norm_kwargs=None, **kwargs):
+    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, pre_conv_channel=-1, norm_kwargs=None, **kwargs):
         super(_DeepLabHead, self).__init__()
-        self.do_preconv = pre_conv
-        if pre_conv:
+        self.do_preconv = pre_conv_channel > 0
+        pre_conv_out_channel = 2048
+        # pre_conv_out_channel = 256
+        if self.do_preconv:
             self.pre_conv = nn.Sequential(
-                nn.Conv2d(512, 2048, 3, padding=1, bias=False),
-                norm_layer(2048, **({} if norm_kwargs is None else norm_kwargs)),
+                nn.Conv2d(pre_conv_channel, pre_conv_out_channel, 3, padding=1, bias=False),
+                norm_layer(pre_conv_out_channel, **({} if norm_kwargs is None else norm_kwargs)),
                 nn.ReLU(True),
             )
-        self.aspp = _ASPP(2048, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
+        self.aspp = _ASPP(pre_conv_out_channel, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
         self.block = nn.Sequential(
             nn.Conv2d(256, 256, 3, padding=1, bias=False),
             norm_layer(256, **({} if norm_kwargs is None else norm_kwargs)),

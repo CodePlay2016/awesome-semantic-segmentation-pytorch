@@ -60,14 +60,9 @@ class MapillarySegmentation(SegmentationDataset):
         if len(self.images) == 0:
             raise RuntimeError("Found 0 images in subfolders of:" + root + "\n")
         if not self.USE_FULL_LABEL:
-            self.valid_classes = []
-            for ii in range(-1, len(self.KEY)-1):
-                if not self.KEY[ii] == -1:
-                    self.valid_classes.append(ii)
             self._key = np.array(self.KEY)
             self._mapping = np.array(list(range(0, len(self._key)))).astype('int32')
         else:
-            self.valid_classes = list(range(0, self.NUM_CLASS))
             self._key = np.arange(0, self.NUM_CLASS)
             self._mapping = np.array(range(0, len(self._key))).astype('int32')
 
@@ -134,7 +129,7 @@ def _get_mapillary_pairs(folder, split='train'):
 
     if split in ('train', 'val'):
         img_folder = os.path.join(folder, split_map[split], 'images')
-        mask_folder = os.path.join(folder, split_map[split], 'labels')
+        mask_folder = os.path.join(folder, split_map[split], 'labels.full.bak')
         img_paths, mask_paths = get_path_pairs(img_folder, mask_folder)
         return img_paths, mask_paths
     else:

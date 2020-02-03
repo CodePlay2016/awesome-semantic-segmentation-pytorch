@@ -9,6 +9,7 @@ from ..utils.download import download, check_sha1
 __all__ = ['get_model_file', 'get_resnet_file']
 
 _model_sha1 = {name: checksum for checksum, name in [
+    ('b0353104','mobilenet_v2'),
     ('5c106cde', 'resnet18'),
     ('25c4b50959ef024fcc050213a06b614899f94b3d', 'resnet50'),
     ('2a57e44de9c853fa015b172309a1ee7e2d0e4e2a', 'resnet101'),

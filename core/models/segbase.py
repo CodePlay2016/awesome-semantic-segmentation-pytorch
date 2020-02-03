@@ -23,6 +23,7 @@ class SegBaseModel(nn.Module):
         dilated = False if jpu else True
         self.aux = aux
         self.nclass = nclass
+        self.backbone = backbone
         if backbone == 'resnet50':
             self.pretrained = resnet50_v1s(pretrained=pretrained_base, dilated=dilated, **kwargs)
         elif backbone == 'mobilenetv2':
@@ -40,14 +41,18 @@ class SegBaseModel(nn.Module):
 
     def base_forward(self, x):
         """forwarding pre-trained network"""
-        x = self.pretrained.conv1(x)
-        x = self.pretrained.bn1(x)
-        x = self.pretrained.relu(x)
-        x = self.pretrained.maxpool(x)
-        c1 = self.pretrained.layer1(x)
-        c2 = self.pretrained.layer2(c1)
-        c3 = self.pretrained.layer3(c2)
-        c4 = self.pretrained.layer4(c3)
+        if self.backbone == 'mobilenetv2':
+            c4 = self.pretrained.features(x)
+            return c4
+        else:
+            x = self.pretrained.conv1(x)
+            x = self.pretrained.bn1(x)
+            x = self.pretrained.relu(x)
+            x = self.pretrained.maxpool(x)
+            c1 = self.pretrained.layer1(x)
+            c2 = self.pretrained.layer2(c1)
+            c3 = self.pretrained.layer3(c2)
+            c4 = self.pretrained.layer4(c3)
 
         if self.jpu:
             return self.jpu(c1, c2, c3, c4)
