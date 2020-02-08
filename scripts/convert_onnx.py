@@ -11,11 +11,11 @@ from core.models.model_zoo import get_segmentation_model
 from core.models import get_model
 
 device = torch.device("cpu")
-weights_path = "/home/hufq/LOD/awesome-semantic-segmentation-pytorch/model/mapillary_selected/deeplabv3_resnet50_mapillary.pth"
-# weights_path = "/root/.torch/models/deeplabv3_resnet101_citys.pth"
+# weights_path = "/home/hufq/LOD/awesome-semantic-segmentation-pytorch/model/mapillary_selected/deeplabv3_resnet50_mapillary.pth"
+weights_path = "../model/mapillary_test_1/deeplabv3_mobilenetv2_mapillary.pth"
 weights_dir = "/".join(weights_path.split("/")[:-1])
 weights_name  = weights_path.split("/")[-1].split('.')[0]
-export_weights_path = os.path.join(weights_dir, weights_name+".onnx")
+export_weights_path = os.path.join(weights_dir, weights_name+"_2.onnx")
 # A model class instance (class not shown)
 
 # create network
@@ -37,4 +37,6 @@ height = 320
 width = 640
 dummy_input = torch.randn(sample_batch_size, channel, height, width)
 
+# torch.onnx.export(model, dummy_input, export_weights_path, input_names=['input_image'], output_names=['seg_result'],
+#                   opset_version=11)
 torch.onnx.export(model, dummy_input, export_weights_path, input_names=['input_image'], output_names=['seg_result'])

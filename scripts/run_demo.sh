@@ -1,7 +1,7 @@
 # python demo.py --model deeplabv3_resnet101_citys --dataset citys --input-pic /home/hufq/data/leftImg8bit_trainvaltest/leftImg8bit/test/berlin/berlin_000192_000019_leftImg8bit.png --out-dir /home/hufq/eval
 CUDA_VISIBLE_DEVICES=0 python demo.py \
-    --model deeplabv3_resnet50_mapillary \
-    --save-folder ../model/mapillary_selected \
+    --model deeplabv3_mobilenetv2_mapillary \
+    --save-folder ../model/mapillary_test_1 \
     --dataset mapillary \
     --demo-dir "/home/hufq/data/correct_cylinder/*.png" \
     --input-size '320,640' \

@@ -43,8 +43,8 @@ args = parser.parse_args()
 REP = args.repetition
 
 def demo_vedio(config):
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    device = torch.device('cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device('cpu')
     print('using device %s' % device)
     # output folder
     # load vedio
@@ -86,8 +86,6 @@ def demo_vedio(config):
         sys.stdout.flush()
         video_writer.write(np.array(mask1, dtype=np.uint8))
         frame_index += 1
-        import pdb
-        pdb.set_trace()
     video_writer.release()
     print("finish")
 

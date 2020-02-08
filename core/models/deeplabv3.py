@@ -11,7 +11,8 @@ import time
 __all__ = ['DeepLabV3', 'get_deeplabv3', 'get_deeplabv3_resnet50_voc', 'get_deeplabv3_resnet101_voc',
            'get_deeplabv3_resnet152_voc', 'get_deeplabv3_resnet50_ade', 'get_deeplabv3_resnet101_ade',
            'get_deeplabv3_resnet152_ade', 'get_deeplabv3_resnet101_citys', 'get_deeplabv3_resnet50_mapillary',
-           'get_deeplabv3_resnet101_mapillary', 'get_deeplabv3_resnet152_mapillary', 'get_deeplabv3_resnet18_mapillary']
+           'get_deeplabv3_resnet101_mapillary', 'get_deeplabv3_resnet152_mapillary', 'get_deeplabv3_resnet18_mapillary',
+           'get_deeplabv3_mobilenetv2_mapillary']
 
 INTERPOLATE_MODE = 'bilinear' # linear | bilinear | bicubic | trilinear # can't use linear
 ALIGN_CORNER = True
@@ -40,7 +41,7 @@ class DeepLabV3(SegBaseModel):
     def __init__(self, nclass, backbone='resnet50', aux=False, pretrained_base=True, **kwargs):
         super(DeepLabV3, self).__init__(nclass, aux, backbone, pretrained_base=pretrained_base, **kwargs)
         self.backbone = backbone
-        if kwargs['pre_conv']:
+        if 'pre_conv' in kwargs and kwargs['pre_conv']:
             pre_conv_channel = 512 if backbone == 'resnet18' else 1280
         else:
             pre_conv_channel = -1
@@ -78,8 +79,8 @@ class _DeepLabHead(nn.Module):
     def __init__(self, nclass, norm_layer=nn.BatchNorm2d, pre_conv_channel=-1, norm_kwargs=None, **kwargs):
         super(_DeepLabHead, self).__init__()
         self.do_preconv = pre_conv_channel > 0
-        pre_conv_out_channel = 2048
-        # pre_conv_out_channel = 256
+        # pre_conv_out_channel = 2048
+        pre_conv_out_channel = 256
         if self.do_preconv:
             self.pre_conv = nn.Sequential(
                 nn.Conv2d(pre_conv_channel, pre_conv_out_channel, 3, padding=1, bias=False),
@@ -96,12 +97,14 @@ class _DeepLabHead(nn.Module):
         )
 
     def forward(self, x):
+        # self.do_preconv=True
         if self.do_preconv:
             x = self.pre_conv(x)
         t1 = time.time()
-        x = self.aspp(x)
+        # x = self.aspp(x)
         # print("ASPP cost: %.2f ms" % ((time.time() - t1)*1000))
-        return self.block(x)
+        output = self.block(x)
+        return output
 
 
 class _ASPPConv(nn.Module):
@@ -196,6 +199,9 @@ def get_deeplabv3_resnet101_voc(**kwargs):
 
 def get_deeplabv3_resnet101_citys(**kwargs):
     return get_deeplabv3('citys', 'resnet101', **kwargs)
+
+def get_deeplabv3_mobilenetv2_mapillary(**kwargs):
+    return get_deeplabv3('mapillary', 'mobilenetv2', pre_conv=True, **kwargs)
 
 def get_deeplabv3_resnet18_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet18', pre_conv=True, **kwargs)

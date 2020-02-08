@@ -147,8 +147,8 @@ class Trainer(object):
         args.iters_per_epoch = len(train_dataset) // (args.num_gpus * args.batch_size)
         args.max_iters = args.epochs * args.iters_per_epoch
 
-        if args.multi_cuda:
-            args.batch_size = args.batch_size * len(args.gpu_ids)
+        # if args.multi_cuda:
+        #     args.batch_size = args.batch_size * len(args.gpu_ids)
 
         train_sampler = make_data_sampler(train_dataset, shuffle=True, distributed=args.distributed)
         train_batch_sampler = make_batch_data_sampler(train_sampler, args.batch_size, args.max_iters)
@@ -183,7 +183,7 @@ class Trainer(object):
         # class_weights = [0.1, 20, 5, 20, 5, 5, 1]# road, curb, human, obstacles, vehicles, other, terrain and unlabeld
         class_weights = torch.FloatTensor(class_weights).to(self.device)
         self.criterion = get_segmentation_loss(args.model, use_ohem=args.use_ohem, aux=args.aux,
-                                               aux_weight=args.aux_weight, ignore_index=-1, weight=class_weights).to(self.device)
+                                               aux_weight=args.aux_weight, ignore_index=-1).to(self.device)
 
         # optimizer, for model just includes pretrained, head and auxlayer
         params_list = list()
@@ -289,6 +289,7 @@ class Trainer(object):
             self.metric.update(outputs[0], target)
             pixAcc, mIoU = self.metric.get()
             logger.info("Sample: {:d}, Validation pixAcc: {:.3f}, mIoU: {:.3f}".format(i + 1, pixAcc, mIoU))
+            torch.cuda.empty_cache()
 
         new_pred = (pixAcc + mIoU) / 2
         if new_pred > self.best_pred:
