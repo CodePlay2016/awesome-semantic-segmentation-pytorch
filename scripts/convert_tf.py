@@ -69,13 +69,14 @@ def complete_model():
 def test_model():
     image = cv2.imread("../tests/ori.png")
     image_raw = cv2.resize(image, (640, 320))
+    image_raw = cv2.cvtColor(image_raw, cv2.COLOR_BGR2RGB)
 
-    mean = np.array([0.485, 0.456, 0.406]).reshape((1,1,1,3))
-    std  = np.array([0.229, 0.224, 0.225]).reshape((1,1,1,3))
+    mean = np.array([0.485, 0.456, 0.406]).reshape((1,3,1,1))*127
+    std  = np.array([0.229, 0.224, 0.225]).reshape((1,3,1,1))*255
     image = np.transpose(image_raw, (2,0,1))
-    image = image.as_type(np.float)
-    image = (image - mean) / std
     image = np.expand_dims(image, 0)
+    image = image.astype(np.float)
+    image = (image - mean) / std
 
     tf_graph = load_pb(tf_model_final_path)
     sess = tf.Session(graph=tf_graph)
