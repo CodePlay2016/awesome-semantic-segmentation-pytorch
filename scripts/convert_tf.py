@@ -18,11 +18,20 @@ def convert_model():
     # Load ONNX model and convert to TensorFlow format
     # model_onnx = onnx.load('../model/mapillary_selected/deeplabv3_resnet50_mapillary_2.onnx')
     model_onnx = onnx.load("../model/mapillary_test_1/deeplabv3_mobilenetv2_mapillary_2.onnx")
+    for op in model_onnx.graph.node: # 156 ops
+        print(op)
 
-    tf_rep = prepare(model_onnx, strict=False, opset_version=11)
+    tf_rep = prepare(model_onnx, opset_version=11)
 
     # Export model as .pb file
-    tf_rep.export_graph(tf_model_path)
+    # tf_rep.export_graph(tf_model_path)
+
+    # tf_graph = load_pb(tf_model_path)
+    # sess = tf.Session(graph=tf_graph)
+
+    # Show tensor names in graph
+    # for op in tf_graph.get_operations():
+    #     print(op.values())
 
 
 def load_pb(path_to_pb):
@@ -53,10 +62,15 @@ def complete_model():
         prediction = tf.argmax(pred_result, 3, name='final_seg_result')
 
         with tf.Session(graph=tf_graph) as sess:
+            tf.get_variable_scope().reuse_variables()
             output = sess.run(prediction, feed_dict={input_tensor: dummy_input})
             constant_graph = graph_util.convert_variables_to_constants(sess, sess.graph_def, ['final_seg_result'])
             with tf.gfile.GFile(tf_model_final_path, "wb") as f:
                 f.write(constant_graph.SerializeToString())
+        if True:
+            for op in tf_graph.get_operations():
+                print(op.values())
+            tf.train.write_graph(constant_graph, '../model/mapillary_test_1/', 'deeplabv3_mobilenetv2_mapillary_final.pbtxt')
 
     print(output)
     
@@ -89,6 +103,6 @@ def test_model():
     print(output)
 
 if __name__ == "__main__":
-    # convert_model()
+    convert_model()
     # complete_model()
-    test_model()
+    # test_model()

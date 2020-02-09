@@ -64,7 +64,7 @@ class DeepLabV3(SegBaseModel):
             t1 = time.time()
         x = self.head(c4)
         # print("head cost: %.2fms" % ((time.time() - t1)*1000))
-        x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
+        # x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
         outputs.append(x)
 
         if self.aux and not self.backbone == 'mobilenet_v2':
@@ -76,20 +76,24 @@ class DeepLabV3(SegBaseModel):
 
 
 class _DeepLabHead(nn.Module):
-    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, pre_conv_channel=-1, norm_kwargs=None, **kwargs):
+    def __init__(self, nclass, norm_layer=nn.BatchNorm2d, do_aspp=True, pre_conv_channel=-1, norm_kwargs=None, **kwargs):
         super(_DeepLabHead, self).__init__()
         self.do_preconv = pre_conv_channel > 0
-        # pre_conv_out_channel = 2048
-        pre_conv_out_channel = 256
+        self.do_aspp = do_aspp
+        if self.do_aspp:
+            self.aspp = _ASPP(pre_conv_out_channel, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
+            pre_conv_out_channel = 256
+        else:
+            pre_conv_out_channel = 2048
+
         if self.do_preconv:
             self.pre_conv = nn.Sequential(
                 nn.Conv2d(pre_conv_channel, pre_conv_out_channel, 3, padding=1, bias=False),
                 norm_layer(pre_conv_out_channel, **({} if norm_kwargs is None else norm_kwargs)),
                 nn.ReLU(True),
             )
-        self.aspp = _ASPP(pre_conv_out_channel, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
         self.block = nn.Sequential(
-            nn.Conv2d(256, 256, 3, padding=1, bias=False),
+            nn.Conv2d(pre_conv_out_channel, 256, 3, padding=1, bias=False),
             norm_layer(256, **({} if norm_kwargs is None else norm_kwargs)),
             nn.ReLU(True),
             nn.Dropout(0.1),
@@ -101,7 +105,8 @@ class _DeepLabHead(nn.Module):
         if self.do_preconv:
             x = self.pre_conv(x)
         t1 = time.time()
-        # x = self.aspp(x)
+        if self.do_aspp:
+            x = self.aspp(x)
         # print("ASPP cost: %.2f ms" % ((time.time() - t1)*1000))
         output = self.block(x)
         return output
@@ -204,7 +209,7 @@ def get_deeplabv3_mobilenetv2_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'mobilenetv2', pre_conv=True, **kwargs)
 
 def get_deeplabv3_resnet18_mapillary(**kwargs):
-    return get_deeplabv3('mapillary', 'resnet18', pre_conv=True, **kwargs)
+    return get_deeplabv3('mapillary', 'resnet18', **kwargs)
 
 def get_deeplabv3_resnet50_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet50', **kwargs)

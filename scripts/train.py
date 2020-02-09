@@ -40,6 +40,8 @@ def parse_args():
                                  'resnet101', 'resnet152', 'densenet121',
                                  'densenet161', 'densenet169', 'densenet201'],
                         help='backbone name (default: vgg16)')
+    parser.add_argument('--with-aspp', action='store_true', default=False,
+                        help='whether to add aspp module')
     parser.add_argument('--dataset', type=str, default='pascal_voc',
                         choices=['pascal_voc', 'pascal_aug', 'ade20k',
                                  'citys', 'sbu', 'mapillary'],
@@ -168,7 +170,8 @@ class Trainer(object):
         BatchNorm2d = nn.SyncBatchNorm if args.distributed else nn.BatchNorm2d
         preconv = True if args.backbone in ["resnet18", "mobilenetv2"] else False
         self.model = get_segmentation_model(model=args.model, dataset=args.dataset, backbone=args.backbone,
-                                            aux=args.aux, jpu=args.jpu, norm_layer=BatchNorm2d, pre_conv=preconv).to(self.device)
+                                            aux=args.aux, jpu=args.jpu, norm_layer=BatchNorm2d,
+                                            pre_conv=preconv, do_aspp=args.with_aspp).to(self.device)
         
         # resume checkpoint if needed
         if args.resume:
@@ -307,7 +310,7 @@ def save_checkpoint(model, args, is_best=False):
     filename = '{}_{}_{}.pth'.format(args.model, args.backbone, args.dataset)
     filename = os.path.join(directory, filename)
 
-    if args.distributed:
+    if args.distributed or args.multi_cuda:
         model = model.module
     torch.save(model.state_dict(), filename)
     if is_best:
