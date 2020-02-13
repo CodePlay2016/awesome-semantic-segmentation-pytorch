@@ -60,7 +60,8 @@ def demo_vedio(config):
     
     
     # load model
-    model = get_model(config.model, pretrained=True, root=config.save_folder, local_rank=config.local_rank).to(device)
+    model = get_model(config.model, pretrained=True, pre_conv=True, do_aspp=False,
+                      root=config.save_folder, local_rank=config.local_rank).to(device)
     print('Finished loading model!')
     model.eval()
     # image transform

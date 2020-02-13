@@ -1,4 +1,4 @@
-CUDA_VISIBLE_DEVICES=2,3 \
+CUDA_VISIBLE_DEVICES=0,1 \
 nohup python train.py \
     --model deeplabv3 \
     --backbone resnet18 \

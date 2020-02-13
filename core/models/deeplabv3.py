@@ -38,9 +38,10 @@ class DeepLabV3(SegBaseModel):
         arXiv preprint arXiv:1706.05587 (2017).
     """
 
-    def __init__(self, nclass, backbone='resnet50', aux=False, pretrained_base=True, **kwargs):
+    def __init__(self, nclass, backbone='resnet50', aux=False, pretrained_base=True, export=False, **kwargs):
         super(DeepLabV3, self).__init__(nclass, aux, backbone, pretrained_base=pretrained_base, **kwargs)
         self.backbone = backbone
+        self.export = export
         if 'pre_conv' in kwargs and kwargs['pre_conv']:
             pre_conv_channel = 512 if backbone == 'resnet18' else 1280
         else:
@@ -64,7 +65,12 @@ class DeepLabV3(SegBaseModel):
             t1 = time.time()
         x = self.head(c4)
         # print("head cost: %.2fms" % ((time.time() - t1)*1000))
-        # x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
+        if self.export:
+            # x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
+            # x = torch.argmax(x, 1).squeeze(0)
+            x = x
+        else:
+            x = F.interpolate(x, size, mode=INTERPOLATE_MODE, align_corners=ALIGN_CORNER)
         outputs.append(x)
 
         if self.aux and not self.backbone == 'mobilenet_v2':
@@ -81,10 +87,10 @@ class _DeepLabHead(nn.Module):
         self.do_preconv = pre_conv_channel > 0
         self.do_aspp = do_aspp
         if self.do_aspp:
-            self.aspp = _ASPP(pre_conv_out_channel, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
             pre_conv_out_channel = 256
+            self.aspp = _ASPP(pre_conv_out_channel, [12, 24, 36], norm_layer=norm_layer, norm_kwargs=norm_kwargs, **kwargs)
         else:
-            pre_conv_out_channel = 2048
+            pre_conv_out_channel = 256
 
         if self.do_preconv:
             self.pre_conv = nn.Sequential(
@@ -206,7 +212,7 @@ def get_deeplabv3_resnet101_citys(**kwargs):
     return get_deeplabv3('citys', 'resnet101', **kwargs)
 
 def get_deeplabv3_mobilenetv2_mapillary(**kwargs):
-    return get_deeplabv3('mapillary', 'mobilenetv2', pre_conv=True, **kwargs)
+    return get_deeplabv3('mapillary', 'mobilenetv2', **kwargs)
 
 def get_deeplabv3_resnet18_mapillary(**kwargs):
     return get_deeplabv3('mapillary', 'resnet18', **kwargs)

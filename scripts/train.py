@@ -227,6 +227,7 @@ class Trainer(object):
         save_per_iters = self.args.save_epoch * self.args.iters_per_epoch
         start_time = time.time()
         logger.info('Start training, Total Epochs: {:d} = Total Iterations {:d}'.format(epochs, max_iters))
+        save_checkpoint(self.model, self.args, is_best=False)
 
         self.model.train()
         for iteration, (images, targets, _) in enumerate(self.train_loader):
@@ -277,7 +278,7 @@ class Trainer(object):
         # total_inter, total_union, total_correct, total_label = 0, 0, 0, 0
         is_best = False
         self.metric.reset()
-        if self.args.distributed:
+        if self.args.distributed or self.args.multi_cuda:
             model = self.model.module
         else:
             model = self.model
